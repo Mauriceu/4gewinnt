@@ -1,0 +1,83 @@
+
+.playground {
+    width: 300px;
+    margin: 0px auto;
+
+}
+.score {
+    display: flex;
+    flex-direction: row;
+}
+.score div {
+    text-align: center;
+    height: 30px;
+    border: 1px solid black;
+}
+
+.container1 {
+    display: flex;
+    flex-direction: column;
+}
+
+.container2 {
+
+    display: flex;
+    flex-direction: row;
+}
+.blocks {
+    height: 40px;
+    flex: 1;
+    background-color: #00A0B0;
+    border: 1px solid saddlebrown;
+}
+
+.corny {
+    border-radius: 50px;
+    height: 70%;
+    width: 70%;
+    margin-left: 14%;
+    margin-right: 14%;
+    margin-top: 14%;
+}
+.corny:hover {
+     background-color: #00000020;
+     cursor: grab;
+}
+
+.white {
+    background-color: white;
+}
+
+.yellow1 {
+    background-color: #EDC951;
+}
+.red2 {
+    background-color: #BF280C;
+}
+
+.void {
+    visibility: hidden;
+}
+
+@media only screen and (min-width: 640px) {
+    .playground {
+        width: 480px;
+    }
+
+    .blocks {
+        height: 66px;
+    }
+}
+
+@media only screen and (min-width: 1280px) {
+    .playground {
+        width: 700px;
+    }
+
+    .blocks {
+        height: 98px;
+    }
+
+
+}
+
