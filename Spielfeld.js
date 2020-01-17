@@ -20,9 +20,8 @@ class Struktur {
         }
 
 
-        let counter = 0; //maximum value is inp.length (für "falsche" for-schleife
+        let counter = 0; //maximum value is inp.length (für "falsche" for-schleife)
 
-        //console.log(matrix);
 
         for(let i=0; i < this.rows; i++) {
             for(let k=0; k < this.cols; k++) {
@@ -32,14 +31,12 @@ class Struktur {
             }
         }
 
-        //console.log(matrix);
         return matrix;
     };
 
     getGravity = function (id, data, player) {
 
-        //console.log(player);
-            switch (player) {  //bestimmt, ob eine 1 oder 2 in dem geklickten feld plaziert wird_______platzhalter für gravity logik
+            switch (player) {  //bestimmt, ob "1" oder "2" in dem geklickten feld plaziert wird_______platzhalter für gravity logik
                 case true:
                     data()[id[0]][id[2]] = "1";
                     break;
@@ -48,7 +45,6 @@ class Struktur {
                     break;
             }
 
-            //console.log("knockout ", data);
             return data; //data ist knockout-object
     }
 }

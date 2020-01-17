@@ -24,18 +24,17 @@ class Ausgabe {
         const self = this;
 
 
-        this.chipInserted = function(elem, event) {  ////started "Fallenlassen" und "no click logic"
+        this.chipInserted = function(elem, event) {  ////started "Fallenlassen"
 
             let id = event.target.id;               //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht)
 
 
             let result = self.addColor(id, self.data); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
+
             let resultString = self.matrixToString(result()); //wandelt die data-matrix in einen zusammenhängenden string um
 
-            //console.log(resultString, self.gameSituation);
-
-            let newMatrix = self.Spielfeld.creator(resultString);   //erstellt neue Matrix mit dem geklickten Feld
-            self.data(newMatrix);       //updates data mit der neuen Matrix
+            let newMatrix = self.Spielfeld.creator(resultString);   //erstellt aus dem neuen String eine neue Matrix
+            self.data(newMatrix);       //updated data mit der neuen Matrix
 
             self.player = !self.player; //wechselt den Spieler
         };
@@ -49,10 +48,10 @@ class Ausgabe {
             this.playerBoxUpdate();    //wechselt die farbe der playerbox
 
             let result = this.Spielfeld.getGravity(id, data, this.player);  //self.data ist knockout-object
-            //console.log("addC ", result);
+
             return result; //result ist knockout-object
 
-        } else {    ////wenn der oberste stein in der spalte schon gefüllt ist
+        } else {    ////wenn das feld schon gefüllt ist
 
             alert("Bruh, this one is already full.");
 
