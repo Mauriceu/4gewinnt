@@ -36,20 +36,19 @@ class Struktur {
         return matrix;
     };
 
-
     getGravity = function (id, data, player) {
 
         //console.log(player);
             switch (player) {  //bestimmt, ob eine 1 oder 2 in dem geklickten feld plaziert wird_______platzhalter für gravity logik
                 case true:
-                    data[id[0]][id[2]] = "1";
+                    data()[id[0]][id[2]] = "1";
                     break;
                 case false:
-                    data[id[0]][id[2]] = "2";
+                    data()[id[0]][id[2]] = "2";
                     break;
             }
 
-            //console.log(data); //puts the number 1,2 into the correct array position
-            return data;
+            //console.log("knockout ", data);
+            return data; //data ist knockout-object
     }
 }

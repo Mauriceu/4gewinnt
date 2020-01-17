@@ -29,22 +29,28 @@ class Ausgabe {
             let id = event.target.id;               //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht)
 
 
-            let result = self.addColor(id, self.data());
-            console.log(self);
+            let result = self.addColor(id, self.data); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
+            let resultString = self.matrixToString(result()); //wandelt die data-matrix in einen zusammenhängenden string um
 
-            self.data(result);  //updates data mit dem geklickten feld
+            //console.log(resultString, self.gameSituation);
 
-             self.player = !self.player; //wechselt den Spieler
+            let newMatrix = self.Spielfeld.creator(resultString);   //erstellt neue Matrix mit dem geklickten Feld
+            self.data(newMatrix);       //updates data mit der neuen Matrix
+
+            self.player = !self.player; //wechselt den Spieler
         };
     }
 
     addColor = function(id, data) {
 
 
-        if (data[id[0]][id[2]] === "0") {   ////wenn der geklickte stein nicht gefüllt ist, eg. wenn im array am index "id" noch eine 0 steht
+        if (data()[id[0]][id[2]] === "0") {   ////wenn der geklickte stein nicht gefüllt ist, eg. wenn im array am index "id" noch eine 0 steht
 
             this.playerBoxUpdate();    //wechselt die farbe der playerbox
-            return this.Spielfeld.getGravity(id, data, this.player);
+
+            let result = this.Spielfeld.getGravity(id, data, this.player);  //self.data ist knockout-object
+            //console.log("addC ", result);
+            return result; //result ist knockout-object
 
         } else {    ////wenn der oberste stein in der spalte schon gefüllt ist
 
@@ -73,10 +79,8 @@ class Ausgabe {
     GameInit = function() {   ////creates the playerbox
 
         let result = this.Spielfeld.creator(this.gameSituation);
-        //console.log(result);
-
         this.data(result); //füllt observable mit matrix array, der aus der gamesituation gebildet wird
-        //console.log("what ", this.data);
+        //console.log(this.data());
 
         let p1 = document.getElementById("p1");
         let p2 = document.getElementById("p2");
@@ -94,6 +98,17 @@ class Ausgabe {
 
 
     };
+
+    matrixToString = function(result) {
+
+        let res = "";
+
+        for (let i = 0; i < result.length; i++) {
+            res = res + result[i].join(""); //wandelt die matrix in einen zusammenhängenden string um
+        }
+
+        return res;
+    }
 
 }
 
