@@ -6,50 +6,49 @@ class Ausgabe {
               "0000000"
             + "0000000"
             + "0000000"
-            + "1100000"
-            + "1100000"
+            + "0000000"
+            + "0000000"
             + "1200000";
 
         this.Spielfeld = new Struktur(rows, cols);
 
-        this.data = ko.observableArray([]); //schnittstelle zu html
-        this.data = this.Spielfeld.creator(this.gameSituation); //füllt data mit matrix
 
+        this.data = ko.observableArray(); //schnittstelle zu html
 
-        //console.log(this.data);
         this.GameInit(); //creates playerbox
 
         this.player = true; ////next player logic
         this.end = false; /////checker für die gravity logik
 
-        //this.noClick = 0;    ////for no Click Logic
 
-        var self = this;
+        const self = this;
 
 
         this.chipInserted = function(elem, event) {  ////started "Fallenlassen" und "no click logic"
 
             let id = event.target.id;               //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht)
 
-            self.data  = self.addColor(id, self.data, self.player); //packt den neuen arry in data
-            console.log(self.data);
 
-            self.player = !self.player; //wechselt den Spieler
+            let result = self.addColor(id, self.data());
+            console.log(self);
+
+            self.data(result);  //updates data mit dem geklickten feld
+
+             self.player = !self.player; //wechselt den Spieler
         };
     }
 
     addColor = function(id, data) {
 
-        //console.log(id, data);
 
-        if (data[0][id[2]] === "0") {   ////wenn der oberste stein in der spalte nicht gefüllt ist eg. wenn im array an der stelle "id" noch eine 0 steht
+        if (data[id[0]][id[2]] === "0") {   ////wenn der geklickte stein nicht gefüllt ist, eg. wenn im array am index "id" noch eine 0 steht
 
             this.playerBoxUpdate();    //wechselt die farbe der playerbox
             return this.Spielfeld.getGravity(id, data, this.player);
 
         } else {    ////wenn der oberste stein in der spalte schon gefüllt ist
 
-            alert("Bruh, this column is already full.");
+            alert("Bruh, this one is already full.");
 
         }
     };
@@ -73,6 +72,11 @@ class Ausgabe {
 
     GameInit = function() {   ////creates the playerbox
 
+        let result = this.Spielfeld.creator(this.gameSituation);
+        //console.log(result);
+
+        this.data(result); //füllt observable mit matrix array, der aus der gamesituation gebildet wird
+        //console.log("what ", this.data);
 
         let p1 = document.getElementById("p1");
         let p2 = document.getElementById("p2");

@@ -1,71 +1,55 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Vier Gewinnt</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-        <script type='text/javascript' src='knockout-3.5.1.js'></script>
-        <script type='text/javascript' src='Spielfeld.js'></script>
-        <script type='text/javascript' src='app.js'></script>
-         <link rel='stylesheet' type='text/css' href='style.css'>
-    </head>
 
 
 
-    <body>
+class Struktur {
+    constructor(rows, cols) {
 
-    <div class="playground">
-        <div class="score">
-            <div id="p1" style="flex: 2;"></div>
-            <div class="void" style="flex: 3;">sdfsdfs</div>
-            <div id="p2" style="flex:2"></div>
-        </div>
-
-        <div class="container1" data-bind="foreach: data"> <!-- bindet den data-array ans div-tag. Damit wird für jeden Data-Eintrag das darunterliegende Skript ausgeführt -->
-
-            <div class="container2" data-bind="foreach: $data">
-                <div class="blocks">
-
-                    <div data-bind="css: {corny: $data >= '0', white: $data === '0', yellow1: $data === '1', red2: $data === '2'},
-                                    attr: { 'id': $parentContext.$index() + '_' + $index()},
-                                    click: $root.chipInserted"></div>
-        <!--
-                    <div data-bind="if: $root.$data = 1
-                                    class: 'corny yellow1',
-                                    attr: { 'id': $parentContext.$index() + '_' + $index() },
-                                    click: $root.chipInserted"></div>
-
-                    <div data-bind="if: $root.$data(),
-                                    class: 'corny red2',
-                                    attr: { 'id': $parentContext.$index() + '_' + $index() },
-                                    click: $root.chipInserted"></div>
-                     -->
-
-                </div>
-            </div>
-        </div>
-    </div>
+        this.rows = rows;
+        this.cols = cols;
 
 
-    </body>
+    }
+
+    creator = function (inp) {
 
 
-</html>
+        let matrix = Array(this.rows); //baut die reihen
+
+        for(let i=0; i < this.rows; i++){ //baut die spalten
+            matrix[i] = Array(this.cols);
+        }
 
 
-<!--
+        let counter = 0; //maximum value is inp.length (für "falsche" for-schleife
 
-<div>
-    <form data-bind="submit: create">
-        Number of Rows:    <input data-bind="value: inrows"/><br>
-        Number of Columns: <input data-bind="value: incols"/><br>
-        Random Numbers: <input type="checkbox" data-bind="checked: randomNum"/>
-        <p data-bind="if: randomNum() !== true">Matrix
-            <input type="text" data-bind="value: input"/>
-        </p>
-        <button type="submit"> Submit </button>
+        //console.log(matrix);
 
-    </form>
-</div>
+        for(let i=0; i < this.rows; i++) {
+            for(let k=0; k < this.cols; k++) {
+
+                matrix[i][k] = inp[counter];
+                counter++;
+            }
+        }
+
+        //console.log(matrix);
+        return matrix;
+    };
 
 
--->
+    getGravity = function (id, data, player) {
+
+        //console.log(player);
+            switch (player) {  //bestimmt, ob eine 1 oder 2 in dem geklickten feld plaziert wird_______platzhalter für gravity logik
+                case true:
+                    data[id[0]][id[2]] = "1";
+                    break;
+                case false:
+                    data[id[0]][id[2]] = "2";
+                    break;
+            }
+
+            //console.log(data); //puts the number 1,2 into the correct array position
+            return data;
+    }
+}

@@ -16,30 +16,19 @@
     <div class="playground">
         <div class="score">
             <div id="p1" style="flex: 2;"></div>
-            <div class="void" style="flex: 3;">sdfsdfs</div>
+            <div class="void" style="flex: 3;"></div>
             <div id="p2" style="flex:2"></div>
         </div>
 
-        <div class="container1" data-bind="foreach: data"> <!-- bindet den data-array ans div-tag. Damit wird für jeden Data-Eintrag das darunterliegende Skript ausgeführt -->
+        <div class="container1" data-bind="foreach: data"> <!-- bindet den Data-array ans div-tag. Damit wird für jeden Data-Eintrag das ein forEach ausgeführt -->
 
-            <div class="container2" data-bind="foreach: $data">
+            <div class="container2" data-bind="foreach: $data"> <!-- bindet einen wert des Data[x]-array ans div-tag. für jeden Data[x] eintrag wird ein forEach ausgeführt -->
                 <div class="blocks">
 
                     <div data-bind="css: {corny: $data >= '0', white: $data === '0', yellow1: $data === '1', red2: $data === '2'},
                                     attr: { 'id': $parentContext.$index() + '_' + $index()},
-                                    click: $root.chipInserted"></div>
-        <!--
-                    <div data-bind="if: $root.$data = 1
-                                    class: 'corny yellow1',
-                                    attr: { 'id': $parentContext.$index() + '_' + $index() },
-                                    click: $root.chipInserted"></div>
-
-                    <div data-bind="if: $root.$data(),
-                                    class: 'corny red2',
-                                    attr: { 'id': $parentContext.$index() + '_' + $index() },
-                                    click: $root.chipInserted"></div>
-                     -->
-
+                                    click: $root.chipInserted">
+                    </div>
                 </div>
             </div>
         </div>
