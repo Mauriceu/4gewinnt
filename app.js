@@ -8,7 +8,7 @@ class Ausgabe {
             + "0000000"
             + "0000000"
             + "0000000"
-            + "1200000";
+            + "0000000";
 
         this.Spielfeld = new Struktur(rows, cols);
 
@@ -18,8 +18,6 @@ class Ausgabe {
         this.GameInit(); //creates playerbox
 
         this.player = true; ////next player logic
-        this.end = false; /////checker für die gravity logik
-
 
         const self = this;
 
@@ -27,6 +25,18 @@ class Ausgabe {
         this.chipInserted = function(elem, event) {  ////started "Fallenlassen"
 
             let id = event.target.id;               //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht)
+            let shortID = id[0] + id[2];
+
+            switch (self.player){ //packt die ID in red/yellow-Array, damit nach Gewinner gesucht werden kann
+                case true:
+                    self.Spielfeld.yellowArr.push(shortID);
+                    break;
+                case false:
+                    self.Spielfeld.redArr.push(shortID);
+                    break;
+                default:
+                    break;
+            }
 
 
             let result = self.addColor(id, self.data); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
@@ -34,9 +44,16 @@ class Ausgabe {
             let resultString = self.matrixToString(result()); //wandelt die data-matrix in einen zusammenhängenden string um
 
             let newMatrix = self.Spielfeld.creator(resultString);   //erstellt aus dem neuen String eine neue Matrix
-            self.data(newMatrix);       //updated data mit der neuen Matrix
+            self.data(newMatrix);       //updates data mit der neuen Matrix
 
             self.player = !self.player; //wechselt den Spieler
+
+            if(self.Spielfeld.isWinner) {
+                alert("congrats, you won");
+            }
+
+
+
         };
     }
 
@@ -47,14 +64,14 @@ class Ausgabe {
 
             this.playerBoxUpdate();    //wechselt die farbe der playerbox
 
-            let result = this.Spielfeld.getGravity(id, data, this.player);  //self.data ist knockout-object
+            let result = this.Spielfeld.getGravity(id, data, this.player);  //returns array with updated value
 
             return result; //result ist knockout-object
 
         } else {    ////wenn das feld schon gefüllt ist
 
             alert("Bruh, this one is already full.");
-
+            return data;
         }
     };
 
@@ -100,15 +117,19 @@ class Ausgabe {
 
     matrixToString = function(result) {
 
-        let res = "";
+        let resultString = "";
 
         for (let i = 0; i < result.length; i++) {
-            res = res + result[i].join(""); //wandelt die matrix in einen zusammenhängenden string um
+            resultString = resultString + result[i].join(""); //wandelt die matrix in einen zusammenhängenden string um
         }
 
-        return res;
+        return resultString;
     }
 
+
+    filterByValue = function(value) {
+        return value === "1";
+    }
 }
 
 
