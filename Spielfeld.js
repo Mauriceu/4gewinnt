@@ -16,6 +16,7 @@ class Struktur {
         this.rows = 6;
         this.cols = 7;
 
+        this.winnerArr = [];
         this.matrix = [];
         this.matrix = this.creator(this.gameSituation);
 
@@ -92,12 +93,25 @@ class Struktur {
             restart = restart + "0";
         }
 
+        this.winnerArr = [];
         return this.creator(restart);
 
     }
 
+    isWinnerField(row, col) {
+        let pos = row + "_" + col;
+
+        for(let i=0; i < this.winnerArr.length; i++){
+            if(pos === this.winnerArr[i]){
+                return true;
+            }
+        }
+        return false;
+    }
 
     checkAllWinner () {
+
+        this.winnerArr = [];
 
         for (let x = 0; x < this.rows; x++){
             for(let y = 0; y < this.cols; y++){
@@ -116,6 +130,7 @@ class Struktur {
                 let winner = this.checkHorizontalWinner(y, x); ///geht die rows durch (horziontale)
 
                 if(winner){
+
                     return winner;
                 }
             }
@@ -154,6 +169,10 @@ class Struktur {
 
         let player = this.matrix[row][col];
 
+        let a = [];
+        a.push(row + "_" + col);
+
+
         if(player === "0"){
             return null;
         }
@@ -167,9 +186,11 @@ class Struktur {
             if(chip !== player){
                 return null;
             }
+            a.push(counter + "_" + i);
             counter++;
         }
 
+        this.winnerArr = a;
         return player;
 
     }
@@ -178,6 +199,10 @@ class Struktur {
     checkDiaRightWinner (row, col){
 
         let player = this.matrix[row][col];
+
+        let a = [];
+        a.push(row + "_" + col);
+
 
         if(player === "0"){
             return null;
@@ -192,9 +217,11 @@ class Struktur {
             if(chip !== player){
                 return null;
             }
+            a.push(counter + "_" + i);
             counter++;
         }
 
+        this.winnerArr = a;
         return player;
     }
 
@@ -202,6 +229,9 @@ class Struktur {
 
     checkHorizontalWinner (row, col){
         let player = this.matrix[row][col];
+
+        let a = [];
+        a.push(row + "_" + col);
 
         if(player === "0"){
             return null;
@@ -216,8 +246,10 @@ class Struktur {
             if(chip !== player){
                 return null;
             }
+            a.push(row + "_" + i);
         }
 
+        this.winnerArr = a;
         return player;
     }
 
@@ -225,6 +257,9 @@ class Struktur {
     checkVerticalWinner (row, col) {  ///soll überprüfen, ob es einen gewinner gibt..........
 
         let player = this.matrix[row][col];
+
+        let a = [];
+        a.push(row + "_" + col);
 
         if(player === "0"){
             return null;
@@ -240,8 +275,10 @@ class Struktur {
             if( chip !== player) {
                   return null;
             }
+            a.push(i + "_" + col);
         }
 
+        this.winnerArr = a;
         return player;
     }
 

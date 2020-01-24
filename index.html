@@ -30,7 +30,7 @@
         <div class="container1" data-bind="foreach: data"> <!-- bindet den Data-array ans div-tag. Damit wird für jeden Data-Eintrag das ein forEach ausgeführt -->
 
             <div class="container2" data-bind="foreach: $data"> <!-- bindet einen wert des Data[x]-array ans div-tag. für jeden Data[x] eintrag wird ein forEach ausgeführt -->
-                <div class="blocks">
+                <div data-bind="class: $root.getMyCSS($parentContext.$index(), $index())">
 
                     <div data-bind="css: {corny: $data >= '0', white: $data === '0', yellow1: $data === '1', red2: $data === '2'},
                                     attr: { 'id': $parentContext.$index() + '_' + $index()},
@@ -39,6 +39,8 @@
                 </div>
             </div>
         </div>
+        <div data-bind="click: $root.restart(),
+                        class: 'button'"><h4>Restart The Game</h4></div>
     </div>
 
 

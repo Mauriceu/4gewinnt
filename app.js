@@ -20,43 +20,57 @@ class Ausgabe {
 
         self.chipInserted = function (elem, event) {  ////started "Fallenlassen"
 
-            let id = event.target.id;               //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht)
+            if(self.Struktur.winnerArr.length < 4) {
 
-            self.addColor(id, self.data); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
+                let id = event.target.id;               //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht)
+
+                self.addColor(id, self.data); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
+            }
 
         };
+
+
 
     }
 
 
-    addColor(id, data) {
+    getMyCSS (row, col) {
 
+        if(this.Struktur.isWinnerField(row, col)){ //gibts den blocks ihre farbe
+            return 'blocks winBlocks'; //gibt den gewinner-blocks ihre farbe
+        }
+        return 'blocks';
+    }
+
+
+    restart() {
+        let restart = this.Struktur.restart();
+        this.data(restart);
+
+    }
+
+    addColor(id, data) {
 
 
         if (data()[0][id[2]] === "0") {   ////wenn der oberste stein noch nicht gefüllt ist, eg. wenn im array am index "id" noch eine 0 steht
 
-            this.playerBoxUpdate();    //wechselt die farbe der playerbox
-
             let result = this.Struktur.changeMatrixValue(id, data, this.player); //changes Matrix value
 
-            this.data(result); ///updated data mit neuer matrix
+
+            let winner = this.Struktur.checkAllWinner(); //startet Suche nach gewinner
+            this.data(result); ///updated data mit neuer matrix - muss nach checkAllwinner, sonst wird gewinner erst beim nächsten click erkannt
 
 
-
-            let winner = this.Struktur.checkAllWinner(this.player); //startet Suche nach gewinner
             if (winner === "1") {
                 this.addScore(true);
-                let restart = this.Struktur.restart();
-                this.data(restart);
             }
-
             if(winner === "2"){
                 this.addScore(false);
-                let restart = this.Struktur.restart();
-                this.data(restart);
             }
 
+            this.playerBoxUpdate();    //wechselt die farbe der playerbox
             this.player = !this.player; //wechselt den Spieler
+
 
         } else {    ////wenn das feld schon gefüllt ist
 
@@ -109,6 +123,9 @@ class Ausgabe {
 
 
     };
+
+
+
 
 }
 

@@ -32,6 +32,21 @@
     border: 1px solid rgba(69,40,255,0.40);
 }
 
+.winBlocks {
+    background-color: black;
+}
+
+.button {
+    border: 2px solid black;
+    height: 40px;
+    width: 100%;
+    background-color: darkgoldenrod;
+    text-align: center;
+}
+.button:hover {
+    opacity: 40%;
+}
+
 .corny {
     border-radius: 50px;
     height: 70%;
