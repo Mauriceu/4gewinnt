@@ -2,25 +2,30 @@
 
 
 class Struktur {
-    constructor(rows, cols) {
+    constructor() {
 
-        this.rows = rows;
-        this.cols = cols;
+        this.gameSituation =
+              "0000000"
+            + "0000000"
+            + "0000000"
+            + "0000000"
+            + "0000000"
+            + "0000000";
 
-        this.yellowArr = [];
-        this.redArr = [];
+        this.rows = 6;
+        this.cols = 7;
 
-        var self = this;
+        this.matrix = [];
+        this.matrix = this.creator(this.gameSituation);
+
+
     }
 
-
-
-    creator = function (inp) {
-
+    creator (inp) {
 
         let matrix = Array(this.rows); //baut die reihen
 
-        for(let i=0; i < this.rows; i++){ //baut die spalten
+        for (let i = 0; i < this.rows; i++) { //baut die spalten
             matrix[i] = Array(this.cols);
         }
 
@@ -28,66 +33,225 @@ class Struktur {
         let counter = 0; //maximum value is inp.length (für "falsche" for-schleife)
 
 
-        for(let i=0; i < this.rows; i++) {
-            for(let k=0; k < this.cols; k++) {
+        for (let i = 0; i < this.rows; i++) {
+            for (let k = 0; k < this.cols; k++) {
 
                 matrix[i][k] = inp[counter];
                 counter++;
             }
         }
-
+        this.matrix = matrix;
         return matrix;
+
     };
 
-    getGravity = function (id, data, player) {  //bestimmt, ob "1" oder "2" in dem geklickten feld plaziert wird____platzhalter für gravity logik
 
-            switch (player) {
-                case true:
-                    data()[id[0]][id[2]] = "1";
-                    break;
-                case false:
-                    data()[id[0]][id[2]] = "2";
-                    break;
+    changeMatrixValue (id, data, player) {  //bestimmt, ob "1" oder "2" in dem geklickten feld plaziert wird____platzhalter für gravity logik
+
+        switch (player) {
+            case true:
+                data()[id[0]][id[2]] = "1";
+                break;
+            case false:
+                data()[id[0]][id[2]] = "2";
+                break;
+        }
+
+        return this.matrixToString(data()); //data ist knockout-object
+    };
+
+
+    matrixToString (result) {
+
+        let resultString = "";
+
+        for (let i = 0; i < result.length; i++) {
+            resultString = resultString + result[i].join(""); //wandelt die matrix in einen zusammenhängenden string um
+        }
+        //console.log(resultString);
+        return this.creator(resultString);
+    };
+
+
+    restart () {
+        let restart = "";
+        for(let i=0; i < this.gameSituation.length; i++){
+            restart = restart + "0";
+        }
+
+        return this.creator(restart);
+
+    }
+
+
+    checkAllWinner () {
+
+        for (let x = 0; x < this.rows; x++){
+            for(let y = 0; y < this.cols; y++){
+
+                let winner = this.checkVerticalWinner(x, y); //geht die columns durch (vertikale)
+
+                if(winner){
+                    return winner;
+                }
             }
+        }
 
-           self.isWinner = this.checkForWinner(data(), id, player);
+        for(let x=0; x < this.cols; x++){
+            for(let y=0; y < this.rows; y++){
 
-            return data; //data ist knockout-object
-    };
+                let winner = this.checkHorizontalWinner(y, x); ///geht die rows durch (horziontale)
 
-
-    checkForWinner = function(data, id, player) {  ///soll überprüfen, ob es einen gewinner gibt..........
-        ///looks alright
-        //pushes indizes der geklickten felder des aktuellen spielers in einen array
-        //vergleicht nacheinander die werte im array, ob sie nebeneinander liegen
-        //
-        let rowArr = [];
-        let colArr = [];
-        let diaArr = [];
-        let winArr = [];
-
-
-        let stoneColor;
-        if (player) { //welcher spieler wird geprüft
-            stoneColor = "1";
-            winArr = this.yellowArr;
-        } else {
-            stoneColor = "2";
-            winArr = this.redArr;
+                if(winner){
+                    return winner;
+                }
+            }
         }
 
 
+        for (let x = 0; x < this.rows - 2; x++){
+            for(let y = 0; y < this.cols - 4; y++) {
 
-        //console.log("bis hier gehts ", data);
-        // winArr.sort((num, val) => {return num - val}); //sortiert den array nach zahlengröße
-        console.log("winArr ", winArr);
-        console.log("yell, red -Arr ", this.yellowArr, this.redArr);
-        //console.log("winArr länge: ", winArr.length);
+                let winner = this.checkDiaRightWinner(x, y); //geht die columns durch (vertikale)
+
+                if (winner) { //wenn winner !== null ist
+                    return winner;
+                }
+
+            }
+        }
+
+        for (let x = 0; x < this.rows - 3; x++){
+            for(let y = 3; y < this.cols; y++) {
+
+                let winner = this.checkDiaLeftWinner(x, y); //geht die columns durch (vertikale)
+
+                if (winner) {
+                    return winner;
+                }
+
+            }
+        }
+
+        return null; //wenn es keinen gewinner gibt
+
+    };
+
+    checkDiaLeftWinner (row, col) {
+
+        let player = this.matrix[row][col];
+
+        if(player === "0"){
+            return null;
+        }
+        ///kein test ob noch genug felder zur verfügung stehen, da variablen in der for-schleife die zu testenden felder begrenzt
+
+        let counter = row;
+        for(let i = col; i > col - 4; i--){
+
+            let chip = this.matrix[counter][i];
+
+            if(chip !== player){
+                return null;
+            }
+            counter++;
+        }
+
+        return player;
+
+    }
 
 
-        let check = 0;//counter für "noise-values"
+    checkDiaRightWinner (row, col){
+
+        let player = this.matrix[row][col];
 
 
+
+        if(player === "0"){
+            return null;
+        }
+        ///kein test ob noch genug felder zur verfügung stehen, da variablen in der for-schleife die zu testenden felder begrenzt
+
+        let counter = row;
+        for(let i = col; i < col + 4; i++){
+
+            let chip = this.matrix[counter][i];
+
+            if(chip !== player){
+                return null;
+            }
+            counter++;
+        }
+
+        return player;
+    }
+
+
+
+    checkHorizontalWinner (row, col){
+        let player = this.matrix[row][col];
+
+        if(player === "0"){
+            return null;
+        }
+        if(col > this.cols - 3){
+            return null;
+        }
+
+        for(let i = col + 1; i < col + 4; i++){
+
+            let chip = this.matrix[row][i];
+            if(chip !== player){
+                return null;
+            }
+        }
+
+        return player;
+    }
+
+
+    checkVerticalWinner (row, col) {  ///soll überprüfen, ob es einen gewinner gibt..........
+
+        let player = this.matrix[row][col];
+
+        if(player === "0"){
+            return null;
+        }
+        if(row >= this.rows - 3){
+            return null;
+        }
+
+
+        for(let i = row + 1; i < row + 4; i++){ //prüft nur vertikale felder
+
+            let chip = this.matrix[i][col];
+            if( chip !== player) {
+                  return null;
+            }
+        }
+
+        return player;
+    }
+
+
+}
+
+exports.Struktur = Struktur;
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
         if (winArr.length > 1) {
 
         for (let count = 0; count < winArr.length-1; count++) {
@@ -110,23 +274,25 @@ class Struktur {
 
             } else {check++}
 
-            if(check > 3){ //wenn neben dem geklickten feld keine weiteren gefunden wurden, wird dieser wert aus winArr gelöscht
-                winArr = winArr.splice(winArr.indexOf(winArr[count]), 1); //soll "Noise-values " aus winArr entfernen
-
-                check = 0;
+            console.log(Number(winArr[count][0]-1));
+            if(check === 3){ //wenn neben dem geklickten feld keine weiteren gefunden wurden, wird dieser wert aus winArr gelöscht
+               //winArr = winArr.splice(winArr.indexOf(winArr[count]), 1); //soll "Noise-values " aus winArr entfernen
+                //winArr = winArr.splice(winArr.indexOf(winArr[count]),1);
+            check = 0;
             }
         }
+
             //console.log("count: ", count);
             console.log("check Arrs: ", rowArr, colArr, diaArr);
             console.log("winArr spliced: ", winArr);
             //console.log("winArr sliced: ", winArr);
     }
 
-        if(rowArr.length >= 3 && colArr.length === 0 && diaArr.length === 0){
+        if(rowArr.length >= 3 && colArr.length < 3 && diaArr.length < 3){
             console.log("there is a winner")
-        } else if(rowArr.length === 0 && colArr.length === 3 && diaArr.length === 0){
+        } else if(rowArr.length < 3 && colArr.length === 3 && diaArr.length < 0){
             console.log("there is a winner")
-        } else if(rowArr.length === 0 && colArr.length === 0 && diaArr.length === 3){
+        } else if(rowArr.length < 0 && colArr.length < 0 && diaArr.length >= 3){
             console.log("there is a winner")
         }
 

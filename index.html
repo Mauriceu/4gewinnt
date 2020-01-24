@@ -16,8 +16,11 @@
     <div class="playground">
         <div class="score">
             <div id="p1" style="flex: 2;"></div>
+            <div id="p1wins" data-bind="text: scoreP1"></div>
+
             <div class="void" style="flex: 3;"></div>
             <div id="p2" style="flex:2"></div>
+            <div id="p2wins" data-bind="text: scoreP2"></div>
         </div>
 
         <div class="container1" data-bind="foreach: data"> <!-- bindet den Data-array ans div-tag. Damit wird für jeden Data-Eintrag das ein forEach ausgeführt -->

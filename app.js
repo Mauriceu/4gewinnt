@@ -1,82 +1,79 @@
 
 class Ausgabe {
-    constructor(rows, cols) {
-
-        this.gameSituation =
-              "0000000"
-            + "0000000"
-            + "0000000"
-            + "0000000"
-            + "0000000"
-            + "0000000";
-
-        this.Spielfeld = new Struktur(rows, cols);
+    constructor() {
 
 
         this.data = ko.observableArray(); //schnittstelle zu html
+        this.scoreP1 = ko.observable(0);
+        this.scoreP2 = ko.observable(0);
+
+
+        this.Struktur = new Struktur();
+        this.data(this.Struktur.matrix); //füllt data
+
 
         this.GameInit(); //creates playerbox
-
         this.player = true; ////next player logic
 
         const self = this;
 
 
-        this.chipInserted = function(elem, event) {  ////started "Fallenlassen"
+        self.chipInserted = function (elem, event) {  ////started "Fallenlassen"
 
             let id = event.target.id;               //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht)
-            let shortID = id[0] + id[2];
 
-            switch (self.player){ //packt die ID in red/yellow-Array, damit nach Gewinner gesucht werden kann
-                case true:
-                    self.Spielfeld.yellowArr.push(shortID);
-                    break;
-                case false:
-                    self.Spielfeld.redArr.push(shortID);
-                    break;
-                default:
-                    break;
-            }
-
-
-            let result = self.addColor(id, self.data); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
-
-            let resultString = self.matrixToString(result()); //wandelt die data-matrix in einen zusammenhängenden string um
-
-            let newMatrix = self.Spielfeld.creator(resultString);   //erstellt aus dem neuen String eine neue Matrix
-            self.data(newMatrix);       //updates data mit der neuen Matrix
-
-            self.player = !self.player; //wechselt den Spieler
-
-            if(self.Spielfeld.isWinner) {
-                alert("congrats, you won");
-            }
-
-
+            self.addColor(id, self.data); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
 
         };
+
     }
 
-    addColor = function(id, data) {
+
+    addColor(id, data) {
 
 
         if (data()[id[0]][id[2]] === "0") {   ////wenn der geklickte stein nicht gefüllt ist, eg. wenn im array am index "id" noch eine 0 steht
 
             this.playerBoxUpdate();    //wechselt die farbe der playerbox
 
-            let result = this.Spielfeld.getGravity(id, data, this.player);  //returns array with updated value
+            let result = this.Struktur.changeMatrixValue(id, data, this.player); //changes Matrix value
 
-            return result; //result ist knockout-object
+            this.data(result); ///updated data mit neuer matrix
+
+
+
+            let winner = this.Struktur.checkAllWinner(this.player); //startet Suche nach gewinner
+            if (winner === "1") {
+                this.addScore(true);
+                let restart = this.Struktur.restart();
+                this.data(restart);
+            }
+
+            if(winner === "2"){
+                this.addScore(false);
+                let restart = this.Struktur.restart();
+                this.data(restart);
+            }
+
+            this.player = !this.player; //wechselt den Spieler
 
         } else {    ////wenn das feld schon gefüllt ist
 
             alert("Bruh, this one is already full.");
-            return data;
         }
     };
 
+    addScore(player){
+        if(player){
+            this.scoreP1(this.scoreP1() + 1);
+        }else {
+            this.scoreP2(this.scoreP2() + 1);
+        }
+    }
 
-    playerBoxUpdate = function() {
+
+
+    playerBoxUpdate () {
 
         let p1 = document.getElementById("p1");
         let p2 = document.getElementById("p2");
@@ -92,11 +89,8 @@ class Ausgabe {
     };
 
 
-    GameInit = function() {   ////creates the playerbox
+    GameInit () {   ////creates the playerbox
 
-        let result = this.Spielfeld.creator(this.gameSituation);
-        this.data(result); //füllt observable mit matrix array, der aus der gamesituation gebildet wird
-        //console.log(this.data());
 
         let p1 = document.getElementById("p1");
         let p2 = document.getElementById("p2");
@@ -115,26 +109,11 @@ class Ausgabe {
 
     };
 
-    matrixToString = function(result) {
-
-        let resultString = "";
-
-        for (let i = 0; i < result.length; i++) {
-            resultString = resultString + result[i].join(""); //wandelt die matrix in einen zusammenhängenden string um
-        }
-
-        return resultString;
-    }
-
-
-    filterByValue = function(value) {
-        return value === "1";
-    }
 }
 
 
 window.onload = function () {
-    let game = new Ausgabe(6, 7);
+    let game = new Ausgabe();
     ko.applyBindings(game);
 
 };

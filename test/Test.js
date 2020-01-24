@@ -1,109 +1,90 @@
-var assert = require("assert");
-
 Struktur = require("../Spielfeld.js").Struktur;
 
-describe('Struktur Basics', function() {
-    describe('creator works!', function() {
-        it('creator works', function () {
-            let a = new Struktur(6, 7);
 
-            a.creator(
-              '0000000'
+let assert = require("assert");
+
+
+describe('winner', function() {
+    describe('Diagonal Winner', function() {
+        it('should be 1', function () {
+
+            let a = new Struktur();
+
+            let input =
+                  '1000000'
+                + '0100000'
+                + '0010000'
+                + '0001000'
                 + '0000000'
-                + '0000200'
-                + '0000200'
-                + '0010200'
-                + '0010200'
-            );
+                + '0000000';
 
+            a.creator(input);
 
-            let result = [ [ '0', '0', '0', '0', '0', '0', '0' ],
-                [ '0', '0', '0', '0', '0', '0', '0' ],
-                [ '0', '0', '0', '0', '2', '0', '0' ],
-                [ '0', '0', '0', '0', '2', '0', '0' ],
-                [ '0', '0', '1', '0', '2', '0', '0' ],
-                [ '0', '0', '1', '0', '2', '0', '0' ] ];
-
-            assert.equal(
-                JSON.stringify(a.matrix),
-                JSON.stringify(result)
-            );
+            assert.equal(a.checkAllWinner(), "1");
         })
     });
 
-    describe('winner', function() {
-        it('vertical 1', function () {
-            let a = new Struktur(6, 7);
+    describe('Diagonal Left Winner', function() {
+        it('should be 1', function () {
 
-            a.creator(
-                '1000000'
-                + '1000000'
-                + '1000200'
-                + '1000200'
+            let a = new Struktur();
+
+            let input =
+                  '1000002'
+                + '0100020'
                 + '0010200'
-                + '0010200'
-            );
+                + '0002000'
+                + '0000000'
+                + '0000000';
 
-            assert.equal(
-                a.getVerticalWinner(0, 0),
-                "1"
-            );
-        });
-        it('vertical 2', function () {
-            let a = new Struktur(6, 7);
+            a.creator(input);
 
-            a.creator(
-                '1000000'
-                + '1000000'
-                + '1000200'
-                + '1000200'
-                + '0010200'
-                + '0010200'
-            );
-
-            assert.equal(
-                a.getVerticalWinner(2, 4),
-                "2"
-            );
-        });
-        it('all1', function () {
-            let a = new Struktur(6, 7);
-
-            a.creator(
-                '1000002'
-                + '1000002'
-                + '0100200'
-                + '1100202'
-                + '0110000'
-                + '0110200'
-            );
-
-            assert.equal(
-                a.getAllVertical(),
-                "1"
-            );
-        });
+            assert.equal(a.checkAllWinner(), "2");
+        })
     });
 
-    // describe('The winner is 1!', function() {
-    //    it('should be 1', function () {
-    //        let a = new Struktur(6, 7);
-    //        a.setMatrixByString(
-    //            '0000000'
-    //            + '0000000'
-    //            + '0001000'
-    //            + '0012000'
-    //            + '0121000'
-    //            + '1221000'
-    //        );
+    describe('Vertical Winner', function() {
+        it('should be 2', function () {
 
-    //        assert.equal(a.isWinner(), 1);
-    //    })
-    //});
+            let a = new Struktur();
+
+            let input =
+                  '1000000'
+                + '2000100'
+                + '2000000'
+                + '2001000'
+                + '2000000'
+                + '0000000';
+
+            a.creator(input);
+
+            assert.equal(a.checkAllWinner(), "2");
+        })
+    });
+
+    describe('Horizontal Winner', function() {
+        it('should be 2', function () {
+
+            let a = new Struktur();
+
+            let input =
+                  '1000000'
+                + '0000100'
+                + '2000000'
+                + '2001000'
+                + '2001111'
+                + '0000000';
+
+            a.creator(input);
+
+            assert.equal(a.checkAllWinner(), "1");
+        })
+    });
 
 });
 
 
+/*
 describe('Array', function(){
     describe('#indexOf()', function(){
         it('should return -1 when the value is not present', function(){
@@ -112,3 +93,4 @@ describe('Array', function(){
         })
     })
 });
+*/
