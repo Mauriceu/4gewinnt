@@ -32,7 +32,8 @@ class Ausgabe {
     addColor(id, data) {
 
 
-        if (data()[id[0]][id[2]] === "0") {   ////wenn der geklickte stein nicht gefüllt ist, eg. wenn im array am index "id" noch eine 0 steht
+
+        if (data()[0][id[2]] === "0") {   ////wenn der oberste stein noch nicht gefüllt ist, eg. wenn im array am index "id" noch eine 0 steht
 
             this.playerBoxUpdate();    //wechselt die farbe der playerbox
 

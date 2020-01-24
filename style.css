@@ -28,8 +28,8 @@
 .blocks {
     height: 40px;
     flex: 1;
-    background-color: #00A0B0;
-    border: 1px solid saddlebrown;
+    background-color: rgba(69,69,255,0.9);
+    border: 1px solid rgba(69,40,255,0.40);
 }
 
 .corny {
@@ -41,7 +41,7 @@
     margin-top: 14%;
 }
 .corny:hover {
-     background-color: #00000020;
+     opacity: 40%;
      cursor: grab;
 }
 
@@ -50,10 +50,10 @@
 }
 
 .yellow1 {
-    background-color: #EDC951;
+    background-color: rgb(138,155,15);
 }
 .red2 {
-    background-color: #BF280C;
+    background-color: rgb(235,104,65);
 }
 
 .void {

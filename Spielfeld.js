@@ -2,15 +2,16 @@
 
 
 class Struktur {
+
     constructor() {
 
         this.gameSituation =
-              "0000000"
-            + "0000000"
-            + "0000000"
-            + "0000000"
-            + "0000000"
-            + "0000000";
+             "0000000"
+            +"0000000"
+            +"0000000"
+            +"0000000"
+            +"0000000"
+            +"0000000";
 
         this.rows = 6;
         this.cols = 7;
@@ -48,16 +49,28 @@ class Struktur {
 
     changeMatrixValue (id, data, player) {  //bestimmt, ob "1" oder "2" in dem geklickten feld plaziert wird____platzhalter für gravity logik
 
-        switch (player) {
-            case true:
-                data()[id[0]][id[2]] = "1";
-                break;
-            case false:
-                data()[id[0]][id[2]] = "2";
-                break;
+        let value = "";
+        if(player){
+            value = "1"
+        } else {
+            value = "2"
         }
 
-        return this.matrixToString(data()); //data ist knockout-object
+
+        data()[0][id[2]] = value; //feld 0 hat definitiv eine "0"
+        for (let i = 1; i < this.rows; i++) {
+
+            if (data()[i][id[2]] === "0") { //wenn das nächste feld auch eine "0" hat
+
+                data()[i - 1][id[2]] = "0"; //dann ändere das vorherige feld wieder auf "0"
+                data()[i][id[2]] = value;  //und gib dem nächsten den "player-value"
+
+            } else { //wenn das nächste feld keine "0" hat
+                return this.matrixToString(data()); //führe logik fort
+            }
+        }
+        return this.matrixToString(data()); //führe logik fort
+
     };
 
 
@@ -109,10 +122,10 @@ class Struktur {
         }
 
 
-        for (let x = 0; x < this.rows - 2; x++){
-            for(let y = 0; y < this.cols - 4; y++) {
+        for (let x = 0; x < this.rows - 3; x++){
+            for(let y = 0; y < this.cols - 3; y++) {
 
-                let winner = this.checkDiaRightWinner(x, y); //geht die columns durch (vertikale)
+                let winner = this.checkDiaRightWinner(x, y); //geht die rechts-diagonalen durch
 
                 if (winner) { //wenn winner !== null ist
                     return winner;
@@ -124,7 +137,7 @@ class Struktur {
         for (let x = 0; x < this.rows - 3; x++){
             for(let y = 3; y < this.cols; y++) {
 
-                let winner = this.checkDiaLeftWinner(x, y); //geht die columns durch (vertikale)
+                let winner = this.checkDiaLeftWinner(x, y); //geht die links-diagonalen durch
 
                 if (winner) {
                     return winner;
@@ -165,8 +178,6 @@ class Struktur {
     checkDiaRightWinner (row, col){
 
         let player = this.matrix[row][col];
-
-
 
         if(player === "0"){
             return null;
@@ -237,7 +248,13 @@ class Struktur {
 
 }
 
-exports.Struktur = Struktur;
+//console.log(typeof function(){}, typeof [], typeof 200, typeof "hello there");
+
+if(typeof exports !== "undefined") {
+    exports.Struktur = Struktur;
+}
+
+
 
 
 

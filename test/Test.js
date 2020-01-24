@@ -1,25 +1,22 @@
 Struktur = require("../Spielfeld.js").Struktur;
 
-
 let assert = require("assert");
 
 
 describe('winner', function() {
-    describe('Diagonal Winner', function() {
-        it('should be 1', function () {
+    describe('Random Winner', function() {
+        it('should be random', function () {
 
             let a = new Struktur();
 
-            let input =
-                  '1000000'
-                + '0100000'
-                + '0010000'
-                + '0001000'
-                + '0000000'
-                + '0000000';
+            let input =  "";
+            for(let i=0; i < 42; i++) {
+                input = input + Math.floor((Math.random() * 3)).toString();
+            }
+
 
             a.creator(input);
-
+            console.log(JSON.stringify(a.matrix));
             assert.equal(a.checkAllWinner(), "1");
         })
     });
@@ -40,6 +37,25 @@ describe('winner', function() {
             a.creator(input);
 
             assert.equal(a.checkAllWinner(), "2");
+        })
+    });
+
+    describe('Diagonal Right Winner', function() {
+        it('should be 1', function () {
+
+            let a = new Struktur();
+
+            let input =
+                  '1000002'
+                + '0100020'
+                + '0010200'
+                + '0001000'
+                + '0000000'
+                + '0000000';
+
+            a.creator(input);
+
+            assert.equal(a.checkAllWinner(), "1");
         })
     });
 
