@@ -17,22 +17,33 @@
 
     <body>
 
+
+
+
     <div class="playground">
+
+
+
         <div class="score">
-            <div id="p1" style="flex: 2;"></div>
+            <div id="p1" style="flex: 3;"></div>
             <div class="yellow1"  data-bind="text: scoreP1"></div>
 
-            <div class="void" style="flex: 3;"></div>
-            <div id="p2" style="flex:2"></div>
+
+            <div data-bind="click: $root.compMatch,
+                            class: 'match'">AI Match?
+            </div>
+
+
+            <div id="p2" style="flex:3"></div>
             <div class="red2" data-bind="text: scoreP2"></div>
         </div>
 
         <div class="container1" data-bind="foreach: data"> <!-- bindet den Data-array ans div-tag. Damit wird für jeden Data-Eintrag das ein forEach ausgeführt -->
 
             <div class="container2" data-bind="foreach: $data"> <!-- bindet einen wert des Data[x]-array ans div-tag. für jeden Data[x] eintrag wird ein forEach ausgeführt -->
-                <div data-bind="class: $root.getMyCSS($parentContext.$index(), $index())">
+                <div data-bind="class:  $root.getMyCSS($parentContext.$index(), $index())">
 
-                    <div data-bind="css: {corny: $data >= '0', white: $data === '0', yellow1: $data === '1', red2: $data === '2'},
+                    <div data-bind="class: $root.getAnimation($parentContext.$index(), $index()),
                                     attr: { 'id': $parentContext.$index() + '_' + $index()},
                                     click: $root.chipInserted">
                     </div>
@@ -40,7 +51,7 @@
             </div>
         </div>
         <div data-bind="click: $root.restart(),
-                        class: 'button'"><h4>Restart The Game</h4></div>
+                        class: 'restart'"><h4>Restart The Game</h4></div>
     </div>
 
 

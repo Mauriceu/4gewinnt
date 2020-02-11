@@ -5,7 +5,7 @@ let assert = require("assert");
 
 describe('winner', function() {
     describe('Random Winner', function() {
-        it('should be random', function () {
+        it('compares winner to player 1', function () {
 
             let a = new Struktur();
 

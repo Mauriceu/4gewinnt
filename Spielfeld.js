@@ -48,32 +48,38 @@ class Struktur {
     };
 
 
-    changeMatrixValue (id, data, player) {  //bestimmt, ob "1" oder "2" in dem geklickten feld plaziert wird____platzhalter für gravity logik
+    changeMatrixValue (id, data, player, i) {  //bestimmt, ob "1" oder "2" in dem geklickten feld plaziert wird____platzhalter für gravity logik, data darf kein ko-objekt sein
 
-        let value = "";
+        let value = "";  ///bestimmt welcher wert (1 oder 2) in die matrix eingefügt werden soll
+
         if(player){
-            value = "1"
-        } else {
-            value = "2"
+            value = "1";
+            return this.leGravity(id, data, value, i); //lässt den stein fallen,
+
         }
-
-
-        data()[0][id[2]] = value; //feld 0 hat definitiv eine "0"
-        for (let i = 1; i < this.rows; i++) {
-
-            if (data()[i][id[2]] === "0") { //wenn das nächste feld auch eine "0" hat
-
-                data()[i - 1][id[2]] = "0"; //dann ändere das vorherige feld wieder auf "0"
-                data()[i][id[2]] = value;  //und gib dem nächsten den "player-value"
-
-            } else { //wenn das nächste feld keine "0" hat
-                return this.matrixToString(data()); //führe logik fort
-            }
+        else {
+            value = "2";
+            return this.leGravity(id, data, value, i); //lässt den stein fallen
         }
-        return this.matrixToString(data()); //führe logik fort
 
     };
 
+
+    leGravity(id, data, value, i) {
+
+        if (data[i][id[2]] === "0") {
+            data[i][id[2]] = value;
+
+            if(i > 0){  ///sobald i > 0 ist, wird das vorherige feld wieder geleert
+                data[i - 1][id[2]] = "0"
+            }
+
+            return this.matrixToString(data);
+
+        } else {
+            return this.matrixToString(data);
+        }
+    }
 
     matrixToString (result) {
 
@@ -82,10 +88,18 @@ class Struktur {
         for (let i = 0; i < result.length; i++) {
             resultString = resultString + result[i].join(""); //wandelt die matrix in einen zusammenhängenden string um
         }
-        //console.log(resultString);
         return this.creator(resultString);
     };
 
+    getStonePlacement(id, data) {  //checkt, wo der stein in der geklickten spalte platziert wird
+
+        for(let i = 0; i < this.rows; i++) {
+            if(data[i][id[2]] !== "0") {
+                return [i, Number(id[2])]
+            }
+        }
+
+    }
 
     restart () {
         let restart = "";

@@ -1,50 +1,173 @@
 
-.playground {
-    width: 300px;
-    margin: 0px auto;
-
+.red2 {
+    background-color: #ce1e00;
 }
-.score {
-    display: flex;
-    flex-direction: row;
-}
-.score div {
-    text-align: center;
-    height: 30px;
-    width: 30px;
-    border: 1px solid black;
+.yellow1 {
+    background-color: #a5b600;
 }
 
-.container1 {
-    display: flex;
-    flex-direction: column;
+.yellow11 {
+    animation-duration: 0.7s;
+    animation-delay: 0.6s;
+    animation-name: placementYellow;
+    background-color: white;
 }
 
-.container2 {
+@keyframes placementYellow {
+    0% {background-color: white}
+    100% {background-color: #a5b600}
 
-    display: flex;
-    flex-direction: row;
-}
-.blocks {
-    height: 40px;
-    flex: 1;
-    background-color: rgba(69,69,255,0.9);
-    border: 1px solid rgba(69,40,255,0.40);
 }
 
-.winBlocks {
-    background-color: black;
+.red22 {
+    animation-duration: 0.7s;
+    animation-delay: 0.65s;
+    animation-name: placementRed;
+    background-color: white;
+}
+@keyframes placementRed {
+    0% {background-color: white}
+    100% {background-color: #ce1e00}
+
 }
 
-.button {
-    border: 2px solid black;
-    height: 40px;
-    width: 100%;
-    background-color: darkgoldenrod;
-    text-align: center;
+/*
+npcAni soll die animationen eds NPC anpassen, damit seine animationen nicht die des spieler überschreiben (npc wartet keine 0.7s bis animation aufhört)
+ */
+.red22npc { /*Für den stein der gesetzt wird*/
+animation-duration: 1.4s;
+animation-delay: 1.3s;
+animation-name: placementRedNPC;
+background-color: white;
 }
-.button:hover {
-    opacity: 40%;
+
+@keyframes placementRedNPC {
+    0% {background-color: white}
+    100% {background-color: #ce1e00}
+
+}
+
+.yellow11npc {   /*Für den stein der gesetzt wird*/
+    animation-duration: 1.4s;
+    animation-delay: 1.3s;
+    animation-name: placementYellowNPC;
+    background-color: white;
+}
+@keyframes placementYellowNPC {
+    0% {background-color: white}
+    100% {background-color: #a5b600}
+
+}
+
+.yellowFadeNPC {    /*Für die steine, die die fall-animation spielen*/
+    background-color: white;
+    animation-name: yellowFadeNPC;
+    animation-duration: 1.4s;
+    animation-delay: 0.7s;
+}
+
+@keyframes yellowFadeNPC {
+    0% {background-color: #a5b600}
+    100% {background-color: white}
+}
+
+.redFadeNPC {   /*Für die steine, die die fall-animation spielen*/
+    background-color: white;
+    animation-name: redFadeNPC;
+    animation-duration: 1.4s;
+    animation-delay: 0.7s;
+}
+
+@keyframes redFadeNPC {
+    0%  {background-color: #ce1e00}
+    100%    {background-color: white}
+}
+
+
+
+/*
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+.red2 {
+    animation-duration: 0.7s;
+    animation-delay: 0.6s;
+    animation-name: placementRed;
+    background-color: white;
+}
+@keyframes placementRed {
+    from {background-color: white}
+    to {background-color: #ce1e00}
+
+}
+
+.yellow1 {
+    animation-duration: 0.7s;
+    animation-delay: 0.6s;
+    animation-name: placementYellow;
+    background-color: white;
+}
+
+*//*
+yellow1 und red2 sind animationen, damit der platzierte stein erst eingeblendet wird, wenn die animation durchgelaufen ist
+    problem: bei jedem neuen stein spielt die animation wieder -> heißt alle platzierten steine werden kurz weiß
+
+ */
+
+
+
+@keyframes redFade {
+    from  {background-color: #ce1e00}
+    to    {background-color: white}
+}
+
+
+@keyframes yellowFade {
+    from {background-color: #a5b600}
+    to {background-color: white}
+}
+
+.rowBase {
+    animation-fill-mode: forwards;
+
+}
+
+.yellowFade {
+    animation-duration: 0.7s;
+    background-color: white;
+    animation-name: yellowFade;
+}
+
+.redFade {
+    animation-duration: 0.7s;
+    background-color: white;
+    animation-name: redFade;
+}
+
+
+
+
+.row0 {
+    animation-delay: 0.1s;
+}
+.row1 {
+    animation-delay: 0.2s;
+}
+.row2 {
+    animation-delay: 0.3s;
+}
+.row3 {
+    animation-delay: 0.4s;
+}
+.row4 {
+    animation-delay: 0.5s;
+}
+.row5 {
+    animation-delay: 0.6s;
+}
+
+
+.white {
+    background-color: white;
 }
 
 .corny {
@@ -56,19 +179,75 @@
     margin-top: 14%;
 }
 .corny:hover {
-     opacity: 40%;
-     cursor: grab;
+    opacity: 40%;
+    cursor: grab;
 }
 
-.white {
-    background-color: white;
+
+.match {
+    background-color: #894da580;
+    flex: 3;
+    display: inline-block;
+} .match:hover {
+    opacity: 70%;
+    cursor: grabbing;
+  }
+
+
+.playground {
+    width: 300px;
+    margin: auto;
+    text-align: center;
 }
 
-.yellow1 {
-    background-color: rgb(138,155,15);
+.score {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
 }
-.red2 {
-    background-color: rgb(235,104,65);
+.score div {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    border: 1px solid black;
+}
+
+.container1 {
+    display: flex;
+    flex-direction: column;
+}
+.container2 {
+    display: flex;
+    flex-direction: row;
+}
+.blocks {
+    height: 40px;
+    flex: 1;
+    background-color: rgba(69,69,255,0.9);
+    border: 1px solid rgba(69,40,255,0.40);
+}
+
+.winBlocks {
+    background-color: rgba(69,69,255,0.9);
+    animation-name: winBlocks;
+    animation-duration: 0.5s;
+    animation-delay:0.4s;
+    animation-fill-mode: forwards;
+}
+@keyframes winBlocks {
+    0% {background-color: rgba(69,69,255,0.9)}
+    100% {background-color: black}
+}
+
+.restart {
+    border: 2px solid black;
+    height: 40px;
+    width: 99.4%;
+    background-color: #3f77ce;
+
+}.restart:hover {
+    opacity: 40%;
+    cursor: grab;
 }
 
 .void {
