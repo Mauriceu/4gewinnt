@@ -31,6 +31,8 @@ class Ausgabe {
 
 
    /////////////der computer darf nicht mitten in der logik des Spieler-spielzugs anfangen (der letzte console.log() in addcolor() wird 2x mal ausgeführt) (einmal für spieler und einmal für AI) --> AI-Logik von spielerlogik trennen....da rekursiv und so
+    /////quatsch ist zwar immer noch zu rekursiv, dafür funzt es!!!!
+
 
                 console.log("before the end: ", self.NPC(), self.player);
 
