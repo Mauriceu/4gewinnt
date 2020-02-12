@@ -4,71 +4,77 @@ class Ausgabe {
 
 
         this.data = ko.observableArray(); //schnittstelle zu html
-        this.scoreP1 = ko.observable(0);
+        this.scoreP1 = ko.observable(0); //every time one of those updates, getAnimated(), getMyCSS(), etc. wird neu aufgerufen  (check computer(), this.NPC("inProgress") )--> knockout hat irgendwo ne funktion um das zu vermeiden
         this.scoreP2 = ko.observable(0);
-        this.NPC = ko.observable("no");  //spieler entscheidet, ob er gegen npc spielt ---> "ready" heißt AI ist bereit für spielzug, "inProgress" heißt AI führt ihren spielzug aus, "no" heißt keine AI
 
+        this.npcWorks = "no"; //spieler entscheidet, ob er gegen npc spielt ---> "ready": bereit für spielzug, "inProgress": führt spielzug aus, "no": keine AI
 
         this.Struktur = new Struktur();
-        this.data(this.Struktur.matrix); //füllt data
+        this.update(this.Struktur.matrix); //fill data passiert in der "applyBindings-funktion"
 
-        this.selectedColumn = null;
+
+        this.selectedColumn = null;  ///die hier müssen mit unlogischen werten anfangen, damit der allererste aufruf von getAnimation() nicht verwurschtelt wird
         this.selectedRow = null;
+        this.selectedRowNPC = null;
+        this.selectedColumnNPC = null;
 
         this.GameInit(); //creates playerbox
         this.player = true; ////next player logic
+
+
 
         const self = this;
 
         self.chipInserted = function (elem, event) {  ////started "Fallenlassen"
 
             let id = event.target.id;   //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht
-
+            let result;
+            let AIresult;
 
             if(self.data()[0][id[2]] === "0" && self.Struktur.winnerArr.length < 4) { //wenn in der ersten spalte noch kein stein liegt, und der noclick check true enthält
 
-                let result = self.addColor(id, self.data()); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
+                result = self.addColor(id, self.data()); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
+
+//console.log("result result ", result, self.npcWorks);
+console.log("AIresult1 ", self.npcWorks, self.player);
 
 
-   /////////////der computer darf nicht mitten in der logik des Spieler-spielzugs anfangen (der letzte console.log() in addcolor() wird 2x mal ausgeführt) (einmal für spieler und einmal für AI) --> AI-Logik von spielerlogik trennen....da rekursiv und so
-    /////quatsch ist zwar immer noch zu rekursiv, dafür funzt es!!!!
+                if(self.doWeHaveAWinner() === "noWinner") {  //wenn niemand gewonnen hat
 
+                    if (self.npcWorks === "ready") { //wenn NPC ready ist, starte seinen spielzug
+                            self.playerUpdate();  //wechselt den player und die playerbox
+                            AIresult = self.startAIplay();  //different than result, da AI ihren zug gemacht hat
+                            self.doWeHaveAWinner();
 
-                console.log("before the end: ", self.NPC(), self.player);
+                            self.update(AIresult);
 
-                if(self.NPC() === "ready") {
-                    self.player = !self.player; //wenn der NPC bereit für sein zug ist, wechselt er den spieler
-                    self.startAIplay();
+                    } else {
+                            self.update(result); ///updated data mit neuer matrix - muss nach doWeHaveAWinner, sonst wird gewinner erst beim nächsten click erkannt
+                    }
+
+                        self.playerUpdate();   //wechselt den player und die playerbox
+
+                    if (self.npcWorks === "inProgress") {
+                            self.npcWorks = "ready";
+                    }  //damit die getAnimation() kacke lösen
+
+                } else {
+                    self.update(result);
                 }
 
-
-                if(self.NPC() === "inProgress") { ///damit sich die npc logik nicht wiederholt, wird hier eine "sperre" eingebaut, die sich vor der doWeHaveAWinner-methode schließt und danach wieder öffnet -> sonst entsteht endlosschleife für npc
-                    self.update(result); ///updated data mit neuer matrix - muss nach doWeHaveAWinner, sonst wird gewinner erst beim nächsten click erkannt
-                    self.doWeHaveAWinner(result); //result ist die durch den aktuellen spielzug geänderte matrix
-
-                } else {  ///if-statement muss bleiben....warum? keine ahnung....denke, dass getAnimation() rekursiv funktioniert - was auch immer die konsequenz daraus ist...jedenfalls MUSS DAS BLEIBEN
-                    self.player = !self.player; //wenn der NPC nicht mehr dran ist (nicht mehr "inProgress"), wechselt er den spieler
-                }
-
-                self.updateNPC();
-
-
-                self.player = !self.player; //wenn keine der beiden spieler-wechsel-logiken drankam
-                console.log("the end: ", self.NPC(), self.player);
-
-
-            } else {    ////wenn das feld schon gefüllt ist
-
+           } else {    ////wenn das feld schon gefüllt ist
                 alert("Impossible (._.)");
             }
+
 
         };
 
     }
 
+
     update(data) {
 
-        if(data.length === 6 && data[0].length === 7) {
+        if(data.length === 6 && data[0].length === 7 ) {
             this.data(data);
 
         } else {
@@ -78,8 +84,6 @@ class Ausgabe {
 
     addColor(id, data) {
 
-        console.log("spieler: ",this.NPC(), this.player);
-
         let result = [];
 
         for(let i = 0; i < 6; i++) {
@@ -88,69 +92,66 @@ class Ausgabe {
 
         ///Notwendig für red/yellow-Fade
         let rowCol = this.Struktur.getStonePlacement(id, result.slice());
-        this.selectedColumn = rowCol[1];
-        this.selectedRow = rowCol[0];
 
-        this.doWeHaveAWinner(result);
-
-
-        console.log("dwhaw finished: ", this.NPC(), this.player);
-
-
-        if(this.NPC() === "no"){
-            console.log("about to update,no NPC");
-            this.update(result); ///updated data mit neuer matrix - muss nach checkAllwinner, sonst wird gewinner erst beim nächsten click erkannt  (mehrere updates des viewmodels vermeiden)
-            this.player = !this.player;
+        console.log("IS IN PROGRESS?? ", this.npcWorks);
+        if(this.npcWorks === "inProgress"){
+            this.selectedColumnNPC = rowCol[1];
+            this.selectedRowNPC = rowCol[0];
+        } else {
+            this.selectedColumn = rowCol[1];
+            this.selectedRow = rowCol[0];
         }
 
-
+       // console.log("this selected column/row player/npc ", this.npcWorks, this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
 
         return result;
-        //console.log("addcol: ", this.NPC());
-
     };
 
-    doWeHaveAWinner(result) {
+    doWeHaveAWinner() {
 
-        let winner = this.Struktur.checkAllWinner(); //startet Suche nach gewinner
-        this.update(result);
+        let winner = this.Struktur.checkAllWinner(); //startet Suche nach gewinner (muss noch result übergeben
+        console.log("do we have a winner ", winner);
 
-        if (winner === "1") {
+        if (winner && this.player) {
             this.addScore(true);
+            this.playerUpdate();  ///ist viewmodel-update
         }
-        else if(winner === "2"){
+        if(winner && !this.player){
             this.addScore(false);
+            this.playerUpdate();  ///ist viewmodel-update
         }
-
-        this.playerBoxUpdate();    //wechselt die farbe der playerbox
-
+        if(winner === null){
+            return "noWinner";
+        }
         //console.log("dwhaw 2: ", this.NPC());
     }
 
     startAIplay(){
+        console.log("startAIplay, player: ", this.player);
 
         if(this.Struktur.winnerArr.length < 4) {
-            console.log("startAI player: ", this.player);
             return this.computer();
         }
 
     }
 
 
-    computer() {
+    computer() {  //click auf button geht, click auf feld nicht ---> what??
 
-        let data = this.data();
+        console.log("this is AI ", this.npcWorks);
 
-            let row = 0;  //egal, da der stein immer nach unten rutscht. Nur die column ist entscheidend
-            let col = Math.floor(Math.random() * 7);
+         let row = 0;  //egal, da der stein immer nach unten rutscht. Nur die column ist entscheidend
+         let col = Math.floor(Math.random() * 7);
 
-            let event = {target: {id: row.toString() + "_" + col.toString()}}; //so aufgebaut, damit der click eines echten spielers simuliert wird
+         let id = row + "_" + col; //der click eines echten spielers wird simuliert  (kann auch einfach id sein...)
 
-        //console.log("comp, id: ", this.NPC(), id);
+        //this.Struktur.NPCmove();
+            //console.log(id);
 
-        if(data[0][col] === "0") {
-            this.NPC("inProgress");  ///npc arbeitet
-            return this.chipInserted(null, event); //brauch den return, um nicht in endlosschleife hängen zu bleiben, (null, da elem in der handler-function nicht gebraucht wird)
+        if(this.data()[0][col] === "0") {
+
+            this.npcWorks = "inProgress";
+            return this.addColor(id, this.data()); //fast die gleiche methode wie "chipInserted()", nur, dass sich das viewmodel separat für den NPC updated (zumindest so die theorie)
 
         } else {
             this.computer(); //wenn die zufällig ausgewählte spalte schon voll ist
@@ -158,39 +159,31 @@ class Ausgabe {
     }
 
 
-    compMatch(elem, event) {
-        this.NPC("ready");
-        this.computer();
-        return;
-    }
-
-
     getAnimation (row, col) {     ///i need to prevent a click being registered when a logic is still in progress. When loading or updating (this.data(*whatever*) with update() ) anything html, this method always fires
 
-        //console.log("this.player, this.NPC: ", this.player, this.NPC());
 
         let result = 'corny rowBase row' + row;//standard styles für alle spielfelder (kreise)
         let value = this.data()[row][col];
 
-       //console.log("1 ", result);
+
+        //console.log("getAni ", this.selectedColumn, this.sele);
 
             if (value === "1") {
 
                 if (this.selectedColumn === col && this.selectedRow === row) {  ////das geklickte feld --> sollte das nächste freie feld in der spalte sein, nicht das direkt geklickte
 
-                    if(this.NPC() === "inProgress"){
-                        console.log(result + " yellow11npc");
-                        return result + " yellow11npc";  //falls der NPC gerade an der reihe ist, muss die setz-animation angepasst werden (da sonst instant platziert)
-
-                    } else {
-                        console.log(result + " yellow11");
-                        return result + ' yellow11'; //yellow11 ist animation für gesetztes feld. Dieses soll nämlich erst gefärbt werden, wenn die "fall-animation" abgeschlossen ist
-                    }
+                        result = result + ' yellow11'; //yellow11 ist animation für gesetztes feld. Dieses soll nämlich erst gefärbt werden, wenn die "fall-animation" abgeschlossen ist
 
                 } else {
-                    console.log(result, " yellow1");
-                    return result + ' yellow1';  //style für player 1
+                    result = result + ' yellow1';  //permanenter style für player 1
                 }
+
+                if(this.selectedColumnNPC === col && this.selectedRowNPC === row){ //falls der NPC gerade an der reihe ist, muss die setz-animation angepasst werden (da sonst instant platziert)
+                    result = result + "npc" + " yellow11npc";
+                }
+
+                console.log("ani val1: ", result);
+                return result;
             }
 
 
@@ -198,54 +191,76 @@ class Ausgabe {
 
                 if (this.selectedColumn === col && this.selectedRow === row) {  ///das geklickte feld --> sollte das nächste freie feld in der spalte sein, nicht das direkt geklickte
 
-                    if(this.NPC() === "inProgress") {
-                        console.log(result + " red22npc");
-                        return result + " red22npc"; //falls der NPC gerade an der reihe ist, muss die fall-animation verzögert werden (da sonst zu schnell)
-
-                    } else {
-                        console.log(result + " red22");
-                        return result + ' red22';  //red22 ist animation für gesetztes feld. Dieses soll nämlich erst gefärbt werden, wenn die "fall-animation" abgeschlossen ist
-                    }
+                        result = result + ' red22';  //red22 ist animation für gesetztes feld. Dieses soll nämlich erst gefärbt werden, wenn die "fall-animation" abgeschlossen ist
 
                 } else {
-                    console.log(result, " red2");
-                    return result + ' red2';  //style für player 2
-                }
-            }
-
-
-            if (this.selectedColumn === col && value === "0") {  //für die spalte des geklickten feldes
-               console.log("selectedCOlumn NPC Player: ", this.NPC(),this.player);
-                if (this.player) {
-
-                    if(this.NPC() === "inProgress") {  //falls der NPC dran ist, dann lass das fallen der steine verzögert starten (da NPC zu schnell ist)
-                        result = result + " yellowFadeNPC";
-
-                    } else { //ansonsten "normale" geschwindigkeit
-                        result = result + ' yellowFade';  //färbt gesamte spalte und löst die farben nacheinander auf
-                    }
+                    result = result + ' red2';  //permanenter style für player 2
 
                 }
 
-                if(this.player === false) {
-
-                    if(this.NPC() === "inProgress") { //falls der NPC dran ist, dann lass das fallen der steine verzögert starten (da NPC zu schnell ist)
-                        result = result + " redFadeNPC";
-
-                    } else {  //ansonsten "normale" geschwindigkeit
-                        result = result + ' redFade'; //färbt gesamte spalte und löst die farben nacheinander auf
-                    }
-
+                if(this.selectedColumnNPC === col && this.selectedRowNPC === row){ //falls der NPC gerade an der reihe ist, muss die fall-animation verzögert werden (da sonst zu schnell)
+                        result = result + "npc" + " red22npc";
                 }
-                console.log("FADE: ", result);
-            } else  { //ansonsten für alle spalten
-                result = result + ' white';  //gibt allen anderren feldern style "white"
-            }
 
+                console.log("ani val2: ", result, this.data());
             return result;
+            }
+
+
+            if (this.selectedColumn === col && value === "0") {  //für die spalte des vom Spieler geklickten feldes
+
+                    console.log("PLAYER SELECTED col/row ", this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
+
+                if(this.data()[this.selectedRow][this.selectedColumn] === "1") { //wenn "mensch" als spieler1 gespielt hat
+                    result = result + ' yellowFade';  //färbt gesamte spalte und löst die farben nacheinander auf
+
+                } else if(this.data()[this.selectedRow][this.selectedColumn] === "2") { //wenn "mensch" als spieler1 gespielt hat
+                    result = result + ' redFade';  //färbt gesamte spalte und löst die farben nacheinander auf
+                }
+
+                console.log("PLAYER FADE: ", this.player, this.npcWorks, result);
+                return result;
+
+            }
+
+            if (this.selectedColumnNPC === col && value === "0") {  //für die spalte des vom NPC geklickten feldes
+
+                console.log("NPC SELECTED col/row ", this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
+
+                if(this.data()[this.selectedRowNPC][this.selectedColumnNPC] === "1") {  ///wenn der NPC dran ist und er spieler 1 ist
+                    result = result + "npc" + " yellowFadeNPC";
+
+                } else if(this.data()[this.selectedRowNPC][this.selectedColumnNPC] === "2"){ //wenn der NPC dran ist und er spieler 2 ist
+                    result = result + "npc" + " redFadeNPC";
+
+                }
+
+            console.log("NPC FADE: ", this.player, this.npcWorks, result);
+            return result;
+
+        }
+
+
+
+        return result + ' white';  //gibt allen anderren feldern style "white"
 
     }
 
+
+    compMatch(elem, event) {
+
+        if(this.Struktur.winnerArr.length < 4) {
+            this.npcWorks = "ready";
+            this.selectedRow = null;
+            this.selectedColumn = null;
+
+            let result = this.computer();
+            this.update(result); ////ahem, muss result haben für ersten ai-move -> wenn man auf den button clickt, wird ai-logik manuell ausgelöst, ansonsten automatisch -> chipInserted wird 2 mal aufgreufen -> rekursivität fickt
+
+            this.npcWorks = "ready";
+            this.playerUpdate();
+        }
+    }
 
     getMyCSS (row, col) {
 
@@ -256,34 +271,35 @@ class Ausgabe {
     }
 
 
-    updateNPC() {
-
-        if(this.NPC() === "inProgress") {
-            this.NPC("ready");  //und damit die klassenzuweisung sinnvoll passiert. Muss nach dem AI-Spielzug wieder auf "ready" gestellt werden
-        }
-    }
-
-
     restart() {
-        this.NPC("no");
+
+        this.selectedRow = null;
+        this.selectedColumn = null;
+        this.selectedRowNPC = null;
+        this.selectedColumnNPC = null;
+
+        this.player = true;
         let restart = this.Struktur.restart();
-        this.data(restart);
+        this.npcWorks = "no";
+        this.update(restart);
 
     }
+
 
     addScore(player){
+
         if(player){
             this.scoreP1(this.scoreP1() + 1);
+        }
 
-        }else {
+        if(!player){
             this.scoreP2(this.scoreP2() + 1);
-
         }
     }
 
 
 
-    playerBoxUpdate () {
+    playerUpdate () {
 
         let p1 = document.getElementById("p1");
         let p2 = document.getElementById("p2");
@@ -296,11 +312,13 @@ class Ausgabe {
             p2.classList.remove("red2");
             p1.classList.add("yellow1");
         }
+
+        console.log("PLAYER UPDATE", !this.player);
+        this.player = !this.player;
     };
 
 
     GameInit () {   ////creates the playerbox
-
 
         let p1 = document.getElementById("p1");
         let p2 = document.getElementById("p2");
@@ -329,6 +347,10 @@ class Ausgabe {
 window.onload = function () {
     let game = new Ausgabe();
     ko.applyBindings(game);
+   //game.scoreP1 = ko.observable().extend({ deferred: true });
+   //game.scoreP2 = ko.observable().extend({ deferred: true });
+    //game.data = ko.observableArray().extend({ deferred: true });
+
 
 };
 

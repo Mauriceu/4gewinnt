@@ -21,7 +21,7 @@
 
 .red22 {
     animation-duration: 0.7s;
-    animation-delay: 0.65s;
+    animation-delay: 0.6s;
     animation-name: placementRed;
     background-color: white;
 }
@@ -35,26 +35,26 @@
 npcAni soll die animationen eds NPC anpassen, damit seine animationen nicht die des spieler überschreiben (npc wartet keine 0.7s bis animation aufhört)
  */
 .red22npc { /*Für den stein der gesetzt wird*/
-animation-duration: 1.4s;
-animation-delay: 1.3s;
+animation-duration: 1.3s;
 animation-name: placementRedNPC;
 background-color: white;
 }
 
 @keyframes placementRedNPC {
     0% {background-color: white}
+    40% {background-color: white}
     100% {background-color: #ce1e00}
 
 }
 
 .yellow11npc {   /*Für den stein der gesetzt wird*/
-    animation-duration: 1.4s;
-    animation-delay: 1.3s;
+    animation-duration: 1.3s;
     animation-name: placementYellowNPC;
     background-color: white;
 }
 @keyframes placementYellowNPC {
     0% {background-color: white}
+    40% {background-color: white}
     100% {background-color: #a5b600}
 
 }
@@ -62,52 +62,26 @@ background-color: white;
 .yellowFadeNPC {    /*Für die steine, die die fall-animation spielen*/
     background-color: white;
     animation-name: yellowFadeNPC;
-    animation-duration: 1.4s;
-    animation-delay: 0.7s;
+    animation-duration: 1.3s;
 }
 
 @keyframes yellowFadeNPC {
-    0% {background-color: #a5b600}
-    100% {background-color: white}
+    from {background-color: #a5b600}
+    to {background-color: white}
 }
 
 .redFadeNPC {   /*Für die steine, die die fall-animation spielen*/
     background-color: white;
     animation-name: redFadeNPC;
-    animation-duration: 1.4s;
-    animation-delay: 0.7s;
+    animation-duration: 1.3s;
 }
 
 @keyframes redFadeNPC {
-    0%  {background-color: #ce1e00}
-    100%    {background-color: white}
+    from  {background-color: #ce1e00}
+    to    {background-color: white}
 }
-
-
 
 /*
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-.red2 {
-    animation-duration: 0.7s;
-    animation-delay: 0.6s;
-    animation-name: placementRed;
-    background-color: white;
-}
-@keyframes placementRed {
-    from {background-color: white}
-    to {background-color: #ce1e00}
-
-}
-
-.yellow1 {
-    animation-duration: 0.7s;
-    animation-delay: 0.6s;
-    animation-name: placementYellow;
-    background-color: white;
-}
-
-*//*
 yellow1 und red2 sind animationen, damit der platzierte stein erst eingeblendet wird, wenn die animation durchgelaufen ist
     problem: bei jedem neuen stein spielt die animation wieder -> heißt alle platzierten steine werden kurz weiß
 
@@ -128,7 +102,6 @@ yellow1 und red2 sind animationen, damit der platzierte stein erst eingeblendet 
 
 .rowBase {
     animation-fill-mode: forwards;
-
 }
 
 .yellowFade {
@@ -164,6 +137,26 @@ yellow1 und red2 sind animationen, damit der platzierte stein erst eingeblendet 
 .row5 {
     animation-delay: 0.6s;
 }
+
+.row0npc{
+    animation-delay: 0.7s;
+}
+.row1npc{
+    animation-delay: 0.8s;
+}
+.row2npc{
+    animation-delay: 0.9s;
+}
+.row3npc{
+    animation-delay: 1s;
+}
+.row4npc{
+    animation-delay: 1.1s;
+}
+.row5npc{
+    animation-delay: 1.2s;
+}
+
 
 
 .white {

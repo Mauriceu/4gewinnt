@@ -23,6 +23,21 @@ class Struktur {
 
     }
 
+    NPCmove() {
+
+        let risky = this.checkAllWinner();
+
+        if(risky.length > 2){
+
+
+        }
+        console.log(this.winnerArr);
+
+
+    }
+
+
+
     creator (inp) {
 
         let matrix = Array(this.rows); //baut die reihen
@@ -127,12 +142,13 @@ class Struktur {
 
         this.winnerArr = [];
 
+
         for (let x = 0; x < this.rows; x++){
             for(let y = 0; y < this.cols; y++){
 
                 let winner = this.checkVerticalWinner(x, y); //geht die columns durch (vertikale)
 
-                if(winner){
+                if(winner.length === 4){
                     return winner;
                 }
             }
@@ -143,8 +159,7 @@ class Struktur {
 
                 let winner = this.checkHorizontalWinner(y, x); ///geht die rows durch (horziontale)
 
-                if(winner){
-
+                if(winner.length === 4) {
                     return winner;
                 }
             }
@@ -156,7 +171,7 @@ class Struktur {
 
                 let winner = this.checkDiaRightWinner(x, y); //geht die rechts-diagonalen durch
 
-                if (winner) { //wenn winner !== null ist
+                if (winner.length === 4) { //wenn winner !== null ist
                     return winner;
                 }
 
@@ -168,7 +183,7 @@ class Struktur {
 
                 let winner = this.checkDiaLeftWinner(x, y); //geht die links-diagonalen durch
 
-                if (winner) {
+                if (winner.length === 4) {
                     return winner;
                 }
 
@@ -188,7 +203,7 @@ class Struktur {
 
 
         if(player === "0"){
-            return null;
+            return [];
         }
         ///kein test ob noch genug felder zur verfügung stehen, da variablen in der for-schleife die zu testenden felder begrenzt
 
@@ -198,14 +213,14 @@ class Struktur {
             let chip = this.matrix[counter][i];
 
             if(chip !== player){
-                return null;
+                return [];
             }
             a.push(counter + "_" + i);
             counter++;
         }
 
         this.winnerArr = a;
-        return player;
+        return a;
 
     }
 
@@ -219,7 +234,7 @@ class Struktur {
 
 
         if(player === "0"){
-            return null;
+            return [];
         }
         ///kein test ob noch genug felder zur verfügung stehen, da variablen in der for-schleife die zu testenden felder begrenzt
 
@@ -229,14 +244,14 @@ class Struktur {
             let chip = this.matrix[counter][i];
 
             if(chip !== player){
-                return null;
+                return [];
             }
             a.push(counter + "_" + i);
             counter++;
         }
 
         this.winnerArr = a;
-        return player;
+        return a;
     }
 
 
@@ -248,23 +263,23 @@ class Struktur {
         a.push(row + "_" + col);
 
         if(player === "0"){
-            return null;
+            return [];
         }
         if(col > this.cols - 3){
-            return null;
+            return [];
         }
 
         for(let i = col + 1; i < col + 4; i++){
 
             let chip = this.matrix[row][i];
             if(chip !== player){
-                return null;
+                return [];
             }
             a.push(row + "_" + i);
         }
 
         this.winnerArr = a;
-        return player;
+        return a;
     }
 
 
@@ -276,10 +291,10 @@ class Struktur {
         a.push(row + "_" + col);
 
         if(player === "0"){
-            return null;
+            return [];
         }
         if(row >= this.rows - 3){
-            return null;
+            return [];
         }
 
 
@@ -287,13 +302,13 @@ class Struktur {
 
             let chip = this.matrix[i][col];
             if( chip !== player) {
-                  return null;
+                  return [];
             }
             a.push(i + "_" + col);
         }
 
         this.winnerArr = a;
-        return player;
+        return a;
     }
 
 
