@@ -21,7 +21,7 @@ class Ausgabe {
         this.GameInit(); //creates playerbox
         this.player = true; ////next player logic
 
-
+        this.click = true;
 
         const self = this;
 
@@ -31,27 +31,37 @@ class Ausgabe {
             let result;
             let AIresult;
 
-            if(self.data()[0][id[2]] === "0" && self.Struktur.winnerArr.length < 4) { //wenn in der ersten spalte noch kein stein liegt, und der noclick check true enthält
+
+            if(self.data()[0][id[2]] === "0" && self.Struktur.winnerArr.length < 4 && self.click) { //wenn in der ersten spalte noch kein stein liegt, und der noclick check true enthält
+
+                self.click = false;
 
                 result = self.addColor(id, self.data()); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
 
-//console.log("result result ", result, self.npcWorks);
-console.log("AIresult1 ", self.npcWorks, self.player);
+
+//console.log("AIresult1 ", self.npcWorks, self.player);
 
 
                 if(self.doWeHaveAWinner() === "noWinner") {  //wenn niemand gewonnen hat
 
                     if (self.npcWorks === "ready") { //wenn NPC ready ist, starte seinen spielzug
                             self.playerUpdate();  //wechselt den player und die playerbox
-                            AIresult = self.startAIplay();  //different than result, da AI ihren zug gemacht hat
+                            AIresult = self.startAIplay(result);  //different than result, da AI ihren zug gemacht hat
                             self.doWeHaveAWinner();
+                        console.log("AI result: ",AIresult);
 
-                            self.update(AIresult);
+                            if(AIresult !== null) {
+                                self.update(AIresult);
+                            } else {
+                                console.log("no AI update mate ");
+                            }
 
                     } else {
+                            console.log("player result ", result);
                             self.update(result); ///updated data mit neuer matrix - muss nach doWeHaveAWinner, sonst wird gewinner erst beim nächsten click erkannt
                     }
 
+                        self.click = true;
                         self.playerUpdate();   //wechselt den player und die playerbox
 
                     if (self.npcWorks === "inProgress") {
@@ -84,6 +94,7 @@ console.log("AIresult1 ", self.npcWorks, self.player);
 
     addColor(id, data) {
 
+        console.log("addColor: ",id);
         let result = [];
 
         for(let i = 0; i < 6; i++) {
@@ -110,14 +121,14 @@ console.log("AIresult1 ", self.npcWorks, self.player);
     doWeHaveAWinner() {
 
         let winner = this.Struktur.checkAllWinner(); //startet Suche nach gewinner (muss noch result übergeben
-        console.log("do we have a winner ", winner);
+        //console.log("do we have a winner ", winner, this.player);
 
         if (winner && this.player) {
-            this.addScore(true);
+            this.addScore(winner);
             this.playerUpdate();  ///ist viewmodel-update
         }
         if(winner && !this.player){
-            this.addScore(false);
+            this.addScore(winner);
             this.playerUpdate();  ///ist viewmodel-update
         }
         if(winner === null){
@@ -126,35 +137,36 @@ console.log("AIresult1 ", self.npcWorks, self.player);
         //console.log("dwhaw 2: ", this.NPC());
     }
 
-    startAIplay(){
-        console.log("startAIplay, player: ", this.player);
-
-        if(this.Struktur.winnerArr.length < 4) {
-            return this.computer();
-        }
-
+    startAIplay(result){
+            return this.computer(result);
     }
 
 
-    computer() {  //click auf button geht, click auf feld nicht ---> what??
+    computer(result) {  //click auf button geht, click auf feld nicht ---> what??
 
-        console.log("this is AI ", this.npcWorks);
+        let row;
+        let col;
+        let id;
 
-         let row = 0;  //egal, da der stein immer nach unten rutscht. Nur die column ist entscheidend
-         let col = Math.floor(Math.random() * 7);
+        console.log("this is the AI move", result);
 
-         let id = row + "_" + col; //der click eines echten spielers wird simuliert  (kann auch einfach id sein...)
+        do {
+            row = Math.floor(Math.random() * 6);  //egal, da der stein immer nach unten rutscht. Nur die column ist entscheidend
+            col = Math.floor(Math.random() * 7);
+
+            id = row + "_" + col; //der click eines echten spielers wird simuliert  (kann auch einfach id sein...)
+            console.log("this is the other AI move", id);
+        }while (result[row][col] !== "0");
+
+
 
         //this.Struktur.NPCmove();
-            //console.log(id);
 
         if(this.data()[0][col] === "0") {
 
             this.npcWorks = "inProgress";
-            return this.addColor(id, this.data()); //fast die gleiche methode wie "chipInserted()", nur, dass sich das viewmodel separat für den NPC updated (zumindest so die theorie)
+            return this.addColor(id, result); //fast die gleiche methode wie "chipInserted()", nur, dass sich das viewmodel separat für den NPC updated (zumindest so die theorie)
 
-        } else {
-            this.computer(); //wenn die zufällig ausgewählte spalte schon voll ist
         }
     }
 
@@ -182,7 +194,7 @@ console.log("AIresult1 ", self.npcWorks, self.player);
                     result = result + "npc" + " yellow11npc";
                 }
 
-                console.log("ani val1: ", result);
+                //console.log("ani val1: ", result);
                 return result;
             }
 
@@ -202,14 +214,14 @@ console.log("AIresult1 ", self.npcWorks, self.player);
                         result = result + "npc" + " red22npc";
                 }
 
-                console.log("ani val2: ", result, this.data());
+                //console.log("ani val2: ", result, this.data());
             return result;
             }
 
 
             if (this.selectedColumn === col && value === "0") {  //für die spalte des vom Spieler geklickten feldes
 
-                    console.log("PLAYER SELECTED col/row ", this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
+                    //console.log("PLAYER SELECTED col/row ", this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
 
                 if(this.data()[this.selectedRow][this.selectedColumn] === "1") { //wenn "mensch" als spieler1 gespielt hat
                     result = result + ' yellowFade';  //färbt gesamte spalte und löst die farben nacheinander auf
@@ -218,14 +230,14 @@ console.log("AIresult1 ", self.npcWorks, self.player);
                     result = result + ' redFade';  //färbt gesamte spalte und löst die farben nacheinander auf
                 }
 
-                console.log("PLAYER FADE: ", this.player, this.npcWorks, result);
+                //console.log("PLAYER FADE: ", this.player, this.npcWorks, result);
                 return result;
 
             }
 
             if (this.selectedColumnNPC === col && value === "0") {  //für die spalte des vom NPC geklickten feldes
 
-                console.log("NPC SELECTED col/row ", this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
+                //console.log("NPC SELECTED col/row ", this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
 
                 if(this.data()[this.selectedRowNPC][this.selectedColumnNPC] === "1") {  ///wenn der NPC dran ist und er spieler 1 ist
                     result = result + "npc" + " yellowFadeNPC";
@@ -235,7 +247,7 @@ console.log("AIresult1 ", self.npcWorks, self.player);
 
                 }
 
-            console.log("NPC FADE: ", this.player, this.npcWorks, result);
+            //console.log("NPC FADE: ", this.player, this.npcWorks, result);
             return result;
 
         }
@@ -250,13 +262,17 @@ console.log("AIresult1 ", self.npcWorks, self.player);
     compMatch(elem, event) {
 
         if(this.Struktur.winnerArr.length < 4) {
+            this.click = false;
             this.npcWorks = "ready";
             this.selectedRow = null;
             this.selectedColumn = null;
 
-            let result = this.computer();
+            let result = this.computer(this.data());
+            this.doWeHaveAWinner();
             this.update(result); ////ahem, muss result haben für ersten ai-move -> wenn man auf den button clickt, wird ai-logik manuell ausgelöst, ansonsten automatisch -> chipInserted wird 2 mal aufgreufen -> rekursivität fickt
 
+
+            this.click = true;
             this.npcWorks = "ready";
             this.playerUpdate();
         }
@@ -278,6 +294,7 @@ console.log("AIresult1 ", self.npcWorks, self.player);
         this.selectedRowNPC = null;
         this.selectedColumnNPC = null;
 
+        this.click = true;
         this.player = true;
         let restart = this.Struktur.restart();
         this.npcWorks = "no";
@@ -286,13 +303,16 @@ console.log("AIresult1 ", self.npcWorks, self.player);
     }
 
 
-    addScore(player){
+    addScore(winnerArr){
 
-        if(player){
+        let id1 = winnerArr[0][0] + winnerArr[0][2];
+        Number(id1);
+
+        if(this.data()[id1[0]][id1[1]] === "1"){
             this.scoreP1(this.scoreP1() + 1);
         }
 
-        if(!player){
+        if(this.data()[id1[0]][id1[1]] === "2"){
             this.scoreP2(this.scoreP2() + 1);
         }
     }
