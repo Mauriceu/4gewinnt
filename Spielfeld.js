@@ -25,7 +25,7 @@ class Struktur {
 
     NPCmove() {
 
-        let risky = this.checkAllWinner();
+        let risky = this.checkAllWinner(); //soll die checkAllWinner-logik benutzen, um den besten spielzug herauszufinden --> dafür müssen die returns von checkAllWinner() aber noch angepasst werdne
 
         if(risky.length > 2){
 

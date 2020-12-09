@@ -1,57 +1,54 @@
 
+
+
 class Ausgabe {
     constructor() {
 
-
         this.data = ko.observableArray(); //schnittstelle zu html
-        this.scoreP1 = ko.observable(0); //every time one of those updates, getAnimated(), getMyCSS(), etc. wird neu aufgerufen  (check computer(), this.NPC("inProgress") )--> knockout hat irgendwo ne funktion um das zu vermeiden
+        this.scoreP1 = ko.observable(0); //every time one of those updates, getAnimated(), getMyCSS(), etc. wird neu aufgerufen (knockout spezifisch)
         this.scoreP2 = ko.observable(0);
 
         this.npcWorks = "no"; //spieler entscheidet, ob er gegen npc spielt ---> "ready": bereit für spielzug, "inProgress": führt spielzug aus, "no": keine AI
 
-        this.Struktur = new Struktur();
-        this.update(this.Struktur.matrix); //fill data passiert in der "applyBindings-funktion"
+        this.Struktur = new Struktur(); //erstellt die klasse mit der spiellogik
+        this.update(this.Struktur.matrix); //das füllen des data-arrays passiert wenn die "applyBindings-funktion" aufgerufen wird
 
 
-        this.selectedColumn = null;  ///die hier müssen mit unlogischen werten anfangen, damit der allererste aufruf von getAnimation() nicht verwurschtelt wird
+        this.selectedColumn = null;  ///die hier müssen mit unlogischen werten anfangen, damit der allererste aufruf nicht verwurschelt wird, da getAnimation() besonders ist
         this.selectedRow = null;
         this.selectedRowNPC = null;
         this.selectedColumnNPC = null;
 
-        this.GameInit(); //creates playerbox
+        this.GameInit(); //erstellt spieler und score anzeige
         this.player = true; ////next player logic
 
-        this.click = true;
+        this.click = true; //"ist klick erlaubt?"-logik
 
         const self = this;
 
         self.chipInserted = function (elem, event) {  ////started "Fallenlassen"
 
-            let id = event.target.id;   //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus index des 1. arrays und index des werts, der im genesteten array steht
-            let result;
-            let AIresult;
+            let id = event.target.id;   //"id" des geklickten feldes -> festegelgt durch HTML (id besteht aus dem index des oberen arrays und index des darunterliegenden arrays (genestet)
+            let result; //ergebnis vom spieler-zug
+            let AIresult; //ergebnis vom AI-zug
 
 
-            if(self.data()[0][id[2]] === "0" && self.Struktur.winnerArr.length < 4 && self.click) { //wenn in der ersten spalte noch kein stein liegt, und der noclick check true enthält
+            if(self.data()[0][id[2]] === "0" && self.Struktur.winnerArr.length < 4 && self.click) { //wenn in der ersten reihe der geklickten spalte noch kein stein liegt, und der noclick check true enthält
 
-                self.click = false;
+                self.click = false; //ab jetzt kein click mehr erlaubt
 
-                result = self.addColor(id, self.data()); //packt den entsprechenden Wert (1 oder 2) in den Data-Array
-
-
-//console.log("AIresult1 ", self.npcWorks, self.player);
+                result = self.addColor(id, self.data()); //packt den Wert 'id' (1 oder 2) in den Data-Array
 
 
                 if(self.doWeHaveAWinner() === "noWinner") {  //wenn niemand gewonnen hat
 
-                    if (self.npcWorks === "ready") { //wenn NPC ready ist, starte seinen spielzug
+                    if (self.npcWorks === "ready") { //wenn NPC ready/eingeschaltet ist, starte seinen spielzug
                             self.playerUpdate();  //wechselt den player und die playerbox
-                            AIresult = self.startAIplay(result);  //different than result, da AI ihren zug gemacht hat
-                            self.doWeHaveAWinner();
-                        console.log("AI result: ",AIresult);
+                            AIresult = self.startAIplay(result);  //different than result, cause AI did its move
+                            self.doWeHaveAWinner(); //gibts einen gewinner?
 
-                            if(AIresult !== null) {
-                                self.update(AIresult);
+                            if(AIresult !== null) { //error handler
+                                self.update(AIresult); //update den data-array (und damit das spielfeld)
                             } else {
                                 console.log("no AI update mate ");
                             }
@@ -69,7 +66,7 @@ class Ausgabe {
                     }  //damit die getAnimation() kacke lösen
 
                 } else {
-                    self.update(result);
+                    self.update(result); //wenn jemand gewonnen hat, muss einfach nur das spielfeld geupdated werden
                 }
 
            } else {    ////wenn das feld schon gefüllt ist
@@ -82,54 +79,49 @@ class Ausgabe {
     }
 
 
-    update(data) {
+    update(data) { //updated die Spielfeld-Matrix (gamesituation), wodurch alle "ko.bindings" neu ausgewertet werden
 
-        if(data.length === 6 && data[0].length === 7 ) {
-            this.data(data);
+        if(data.length === 6 && data[0].length === 7 ) { //überprüft das format des übergebenden arrays
+            this.data(data); //wenn er stimmt update this.data mit dem neuen array
 
         } else {
             console.log("matrix update error");
         }
     }
 
-    addColor(id, data) {
+    addColor(id, data) { //soll den feldern ihre farben geben
 
-        console.log("addColor: ",id);
         let result = [];
 
-        for(let i = 0; i < 6; i++) {
-            result = this.Struktur.changeMatrixValue(id, data, this.player, i); //changes Matrix value, data darf nicht als ko-objekt übergeben werden})
+        for(let i = 0; i < 6; i++) { //für jede reihe wird die changeMatrixValue-Funktion einmal ausgeführt, dadurch wird das "fallen" des steins simuliert
+            result = this.Struktur.changeMatrixValue(id, data, this.player, i); //changes the matrix (matrix = array mit 6 einträgen, die alle einen array mit 7 einträgen enthalten (6*7 werte = 42 spielfelder)
         }
 
         ///Notwendig für red/yellow-Fade
-        let rowCol = this.Struktur.getStonePlacement(id, result.slice());
+        let rowCol = this.Struktur.getStonePlacement(id, result.slice()); //getStonePlacement gibt den ort des feldes zurück, das in der geklickten spalte noch unbelegt ist (d.h. wo noch ein stein platziert werden kann)
 
-        console.log("IS IN PROGRESS?? ", this.npcWorks);
-        if(this.npcWorks === "inProgress"){
+        if(this.npcWorks === "inProgress"){ //wenn der NPC seinen Move macht
             this.selectedColumnNPC = rowCol[1];
             this.selectedRowNPC = rowCol[0];
-        } else {
+        } else { //wenn der NPC ausgeschaltet ist bzw. gerade keinen move macht
             this.selectedColumn = rowCol[1];
             this.selectedRow = rowCol[0];
         }
 
-       // console.log("this selected column/row player/npc ", this.npcWorks, this.selectedColumn, this.selectedRow, this.selectedColumnNPC, this.selectedRowNPC);
-
-        return result;
+        return result; //ist matrix-array mit den neuen werten
     };
 
     doWeHaveAWinner() {
 
         let winner = this.Struktur.checkAllWinner(); //startet Suche nach gewinner (muss noch result übergeben
-        //console.log("do we have a winner ", winner, this.player);
 
         if (winner && this.player) {
             this.addScore(winner);
-            this.playerUpdate();  ///ist viewmodel-update
+            this.playerUpdate();  ///viewmodel-update
         }
         if(winner && !this.player){
             this.addScore(winner);
-            this.playerUpdate();  ///ist viewmodel-update
+            this.playerUpdate();  ///viewmodel-update
         }
         if(winner === null){
             return "noWinner";
@@ -142,29 +134,27 @@ class Ausgabe {
     }
 
 
-    computer(result) {  //click auf button geht, click auf feld nicht ---> what??
+    computer(result) {  //legt den spielzug des computers fest. die funktion nimmt einen matrix-array entgegen
 
-        let row;
-        let col;
-        let id;
+        let row; //vom computer "geklickte" reihe
+        let col; //vom computer "geklickte" spalte                                                                                             | diese 0 "repräsentiert" feld 1, da hier eine 0 steht, sit das feld weiß
+        let id; //die "id" (in html wird sie direkt im element durch die indizes der data-matrix festgelegt) feld 1 = data[0][0] ===> data = [[0,0,0,0,0,0],[0,0,0,0,0,0,0], etc]
 
         console.log("this is the AI move", result);
 
         do {
-            row = Math.floor(Math.random() * 6);  //egal, da der stein immer nach unten rutscht. Nur die column ist entscheidend
+            row = 0;                    //kann auch: Math.floor(Math.random() * 6);  // ist an sich aber egal, da der stein immer nach unten rutscht. Nur die column ist entscheidend
             col = Math.floor(Math.random() * 7);
 
             id = row + "_" + col; //der click eines echten spielers wird simuliert  (kann auch einfach id sein...)
             console.log("this is the other AI move", id);
-        }while (result[row][col] !== "0");
+        } while (result[0][col] !== "0");  //wenn eine spalte geklickt wird, die schon einen stein enthält -> wenn an diesem patz im neuen! data-array keine 0 mehr steht (sondern 1 oder 2)
 
 
-
-        //this.Struktur.NPCmove();
 
         if(this.data()[0][col] === "0") {
 
-            this.npcWorks = "inProgress";
+            this.npcWorks = "inProgress"; //stellt die NPC logik um
             return this.addColor(id, result); //fast die gleiche methode wie "chipInserted()", nur, dass sich das viewmodel separat für den NPC updated (zumindest so die theorie)
 
         }
@@ -173,12 +163,9 @@ class Ausgabe {
 
     getAnimation (row, col) {     ///i need to prevent a click being registered when a logic is still in progress. When loading or updating (this.data(*whatever*) with update() ) anything html, this method always fires
 
+        let result = 'corny rowBase row' + row;//standard styles für alle spielfelder (klassenzuweisung)
+        let value = this.data()[row][col]; //der wert, der repräsentativ für das geklickte spielfeld ist (1, 2 oder 0)
 
-        let result = 'corny rowBase row' + row;//standard styles für alle spielfelder (kreise)
-        let value = this.data()[row][col];
-
-
-        //console.log("getAni ", this.selectedColumn, this.sele);
 
             if (value === "1") {
 
@@ -187,7 +174,7 @@ class Ausgabe {
                         result = result + ' yellow11'; //yellow11 ist animation für gesetztes feld. Dieses soll nämlich erst gefärbt werden, wenn die "fall-animation" abgeschlossen ist
 
                 } else {
-                    result = result + ' yellow1';  //permanenter style für player 1
+                    result = result + ' yellow1';  //permanenter farbstyle für player 1
                 }
 
                 if(this.selectedColumnNPC === col && this.selectedRowNPC === row){ //falls der NPC gerade an der reihe ist, muss die setz-animation angepasst werden (da sonst instant platziert)
@@ -246,8 +233,7 @@ class Ausgabe {
                     result = result + "npc" + " redFadeNPC";
 
                 }
-
-            //console.log("NPC FADE: ", this.player, this.npcWorks, result);
+                
             return result;
 
         }
@@ -288,7 +274,6 @@ class Ausgabe {
 
 
     restart() {
-
         this.selectedRow = null;
         this.selectedColumn = null;
         this.selectedRowNPC = null;
@@ -353,14 +338,7 @@ class Ausgabe {
 
         p2.appendChild(node.appendChild(text2));
         //p2.classList.add("red2");
-
-
     };
-
-
-
-
-
 }
 
 
